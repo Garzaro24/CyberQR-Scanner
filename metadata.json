@@ -1,0 +1,5 @@
+{
+  "name": "CyberQR Enterprise",
+  "description": "Enterprise-grade QR authentication and threat detection monitoring for modern security protocols.",
+  "requestFramePermissions": ["camera"]
+}

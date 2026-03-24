@@ -1,0 +1,68 @@
+{
+  "entities": {
+    "User": {
+      "title": "User",
+      "description": "User profile information",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string", "description": "Unique identifier for the user" },
+        "email": { "type": "string", "format": "email", "description": "User's email address" },
+        "displayName": { "type": "string", "description": "User's display name" },
+        "photoURL": { "type": "string", "format": "uri", "description": "User's profile picture URL" },
+        "role": { "type": "string", "enum": ["admin", "user"], "description": "User's role in the system" },
+        "createdAt": { "type": "string", "format": "date-time", "description": "When the user account was created" }
+      },
+      "required": ["uid", "email", "role"]
+    },
+    "Scan": {
+      "title": "Scan",
+      "description": "A QR code scan record",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Unique identifier for the scan" },
+        "userId": { "type": "string", "description": "UID of the user who performed the scan" },
+        "url": { "type": "string", "format": "uri", "description": "The URL encoded in the QR code" },
+        "source": { "type": "string", "description": "Description of the scan source" },
+        "status": { "type": "string", "enum": ["SAFE", "MALICIOUS", "SUSPICIOUS", "PENDING"], "description": "Security status of the scan" },
+        "timestamp": { "type": "string", "format": "date-time", "description": "When the scan was performed" },
+        "threatDetails": {
+          "type": "object",
+          "properties": {
+            "riskScore": { "type": "integer" },
+            "malwareVectors": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "name": { "type": "string" },
+                  "status": { "type": "string" },
+                  "description": { "type": "string" }
+                }
+              }
+            },
+            "riskFactors": {
+              "type": "object",
+              "properties": {
+                "urlReputation": { "type": "integer" },
+                "payloadComplexity": { "type": "integer" },
+                "domainHealth": { "type": "integer" },
+                "latencyAnomaly": { "type": "integer" }
+              }
+            }
+          }
+        }
+      },
+      "required": ["userId", "url", "status", "timestamp"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "User",
+      "description": "User profile documents"
+    },
+    "/scans/{scanId}": {
+      "schema": "Scan",
+      "description": "Individual scan records"
+    }
+  }
+}

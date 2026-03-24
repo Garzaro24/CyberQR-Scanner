@@ -1,0 +1,108 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // ===============================================================
+    // Assumed Data Model
+    // ===============================================================
+    //
+    // Collection: users
+    // Document ID: userId (Firebase Auth UID)
+    // Fields:
+    //   - uid: string (required) - User's unique ID
+    //   - email: string (required) - User's email address
+    //   - displayName: string (optional) - User's display name
+    //   - photoURL: string (optional) - User's profile picture URL
+    //   - role: string (required, enum: ['admin', 'user']) - User's role
+    //   - createdAt: timestamp (required) - Account creation time
+    //
+    // Collection: scans
+    // Document ID: scanId (Auto-generated)
+    // Fields:
+    //   - id: string (required) - Scan ID
+    //   - userId: string (required) - UID of the user who performed the scan
+    //   - url: string (required) - Scanned URL
+    //   - source: string (optional) - Scan source
+    //   - status: string (required, enum: ['SAFE', 'MALICIOUS', 'SUSPICIOUS', 'PENDING']) - Security status
+    //   - timestamp: timestamp (required) - Scan time
+    //   - threatDetails: map (optional) - Detailed threat analysis
+    //
+    // ===============================================================
+
+    // ===============================================================
+    // Helper Functions
+    // ===============================================================
+    
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    function isDocOwner() {
+      return isAuthenticated() && request.auth.uid == resource.data.userId;
+    }
+
+    function isAdmin() {
+      return isAuthenticated() && 
+        (get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin' ||
+         (request.auth.token.email == "cesargarzaro01@gmail.com" && request.auth.token.email_verified == true));
+    }
+
+    function hasRequiredFields(fields) {
+      return request.resource.data.keys().hasAll(fields);
+    }
+
+    function hasOnlyAllowedFields(fields) {
+      return request.resource.data.keys().hasOnly(fields);
+    }
+
+    function isValidEmail(email) {
+      return email is string && email.matches("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$");
+    }
+
+    // ===============================================================
+    // Domain Validators
+    // ===============================================================
+
+    function isValidUser(data) {
+      return hasRequiredFields(['uid', 'email', 'role', 'createdAt']) &&
+             hasOnlyAllowedFields(['uid', 'email', 'displayName', 'photoURL', 'role', 'createdAt']) &&
+             data.uid == request.auth.uid &&
+             isValidEmail(data.email) &&
+             data.role in ['admin', 'user'] &&
+             data.createdAt is timestamp;
+    }
+
+    function isValidScan(data) {
+      return hasRequiredFields(['userId', 'url', 'status', 'timestamp']) &&
+             data.userId == request.auth.uid &&
+             data.url is string &&
+             data.status in ['SAFE', 'MALICIOUS', 'SUSPICIOUS', 'PENDING'] &&
+             data.timestamp is timestamp;
+    }
+
+    // ===============================================================
+    // Rules
+    // ===============================================================
+
+    match /users/{userId} {
+      allow read: if isOwner(userId) || isAdmin();
+      allow create: if isAuthenticated() && isValidUser(request.resource.data) && (request.resource.data.role == 'user' || isAdmin());
+      allow update: if isAuthenticated() && isValidUser(request.resource.data) && (request.resource.data.role == resource.data.role || isAdmin());
+    }
+
+    match /scans/{scanId} {
+      allow read: if isDocOwner() || isAdmin();
+      allow create: if isAuthenticated() && isValidScan(request.resource.data);
+      allow update: if isAdmin(); // Only admins can update scan status/details
+      allow delete: if isAdmin();
+    }
+
+    // Default deny
+    match /{path=**} {
+      allow read, write: if false;
+    }
+  }
+}
