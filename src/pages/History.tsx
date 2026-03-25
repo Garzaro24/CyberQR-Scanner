@@ -10,6 +10,12 @@ export default function History() {
   const [scans, setScans] = useState<ScanRecord[]>([]);
   const [loading, setLoading] = useState(true);
   const [sortBy, setSortBy] = useState<"timestamp" | "status">("timestamp");
+  const [currentPage, setCurrentPage] = useState(1);
+  const pageSize = 20;
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [sortBy]);
 
   useEffect(() => {
     if (!auth.currentUser) return;
@@ -44,6 +50,9 @@ export default function History() {
     const timeB = b.timestamp?.toDate().getTime() || 0;
     return timeB - timeA;
   });
+
+  const totalPages = Math.ceil(sortedScans.length / pageSize);
+  const paginatedScans = sortedScans.slice((currentPage - 1) * pageSize, currentPage * pageSize);
 
   const stats = {
     total: scans.length,
@@ -129,7 +138,9 @@ export default function History() {
             Last 30 Days
           </button>
         </div>
-        <span className="text-[10px] md:text-sm text-on-surface-variant font-medium uppercase tracking-wider">SHOWING {scans.length} OF {stats.total} RECORDS</span>
+        <span className="text-[10px] md:text-sm text-on-surface-variant font-medium uppercase tracking-wider">
+          SHOWING {paginatedScans.length} OF {stats.total} RECORDS (PAGE {currentPage} OF {totalPages || 1})
+        </span>
       </div>
 
       <div className="bg-white rounded-xl overflow-hidden shadow-sm border border-outline-variant/10">
@@ -148,8 +159,8 @@ export default function History() {
                 <tr>
                   <td colSpan={4} className="px-8 py-12 text-center text-on-surface-variant">Loading records...</td>
                 </tr>
-              ) : sortedScans.length > 0 ? (
-                sortedScans.map((scan) => (
+              ) : paginatedScans.length > 0 ? (
+                paginatedScans.map((scan) => (
                   <tr key={scan.id} className="hover:bg-surface-container-low/50 transition-colors group">
                     <td className="px-6 md:px-8 py-4 md:py-6">
                       <div className="flex flex-col">
@@ -193,12 +204,22 @@ export default function History() {
         </div>
         
         <div className="px-6 md:px-8 py-4 md:py-6 bg-surface-container-low/30 border-t border-surface-container-low flex justify-between items-center">
-          <span className="text-xs md:text-sm text-on-surface-variant">Showing {sortedScans.length} results</span>
+          <span className="text-xs md:text-sm text-on-surface-variant">
+            Showing {sortedScans.length > 0 ? ((currentPage - 1) * pageSize) + 1 : 0} to {Math.min(currentPage * pageSize, sortedScans.length)} of {sortedScans.length} results
+          </span>
           <div className="flex gap-2">
-            <button className="p-1.5 md:p-2 border border-outline-variant/20 rounded-lg hover:bg-white disabled:opacity-30" disabled>
+            <button 
+              onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+              className="p-1.5 md:p-2 border border-outline-variant/20 rounded-lg hover:bg-white disabled:opacity-30 transition-colors" 
+              disabled={currentPage === 1}
+            >
               <ChevronLeft className="w-4 h-4" />
             </button>
-            <button className="p-1.5 md:p-2 border border-outline-variant/20 rounded-lg hover:bg-white disabled:opacity-30" disabled>
+            <button 
+              onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+              className="p-1.5 md:p-2 border border-outline-variant/20 rounded-lg hover:bg-white disabled:opacity-30 transition-colors" 
+              disabled={currentPage === totalPages || totalPages === 0}
+            >
               <ChevronRight className="w-4 h-4" />
             </button>
           </div>
