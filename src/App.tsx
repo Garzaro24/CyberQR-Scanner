@@ -4,9 +4,8 @@ import { ErrorBoundary } from "./components/ErrorBoundary";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Layout from "./components/Layout";
 import Login from "./pages/Login";
-import Dashboard from "./pages/Dashboard";
-import Scanner from "./pages/Scanner";
 import History from "./pages/History";
+import Scanner from "./pages/Scanner";
 import ThreatAnalysis from "./pages/ThreatAnalysis";
 import Settings from "./pages/Settings";
 import ResetPassword from "./pages/ResetPassword";
@@ -26,7 +25,7 @@ export default function App() {
               </ProtectedRoute>
             }
           >
-            <Route index element={<Dashboard />} />
+            <Route index element={<Scanner />} />
             <Route path="scanner" element={<Scanner />} />
             <Route path="history" element={<History />} />
             <Route path="analysis/:id" element={<ThreatAnalysis />} />

@@ -4,11 +4,9 @@ import { auth, db } from "../firebase";
 import { signOut } from "firebase/auth";
 import { doc, getDoc } from "firebase/firestore";
 import { 
-  LayoutDashboard, 
   QrCode, 
   History, 
   Settings, 
-  Search, 
   UserCircle, 
   ShieldCheck,
   ShieldAlert,
@@ -44,14 +42,13 @@ export default function Layout() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const navItems = [
-    { name: "Dashboard", path: "/", icon: LayoutDashboard },
-    { name: "Scanner", path: "/scanner", icon: QrCode },
+    { name: "Scanner", path: "/", icon: QrCode },
     { name: "History", path: "/history", icon: History },
     { name: "Settings", path: "/settings", icon: Settings },
   ];
 
   const scannerTools = [
-    { name: "Live Scanner", path: "/scanner", icon: QrCode, active: location.pathname === "/scanner" },
+    { name: "Live Scanner", path: "/", icon: QrCode, active: location.pathname === "/" || location.pathname === "/scanner" },
   ];
 
   return (
