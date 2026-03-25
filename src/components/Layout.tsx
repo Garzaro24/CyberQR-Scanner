@@ -52,7 +52,6 @@ export default function Layout() {
 
   const scannerTools = [
     { name: "Live Scanner", path: "/scanner", icon: QrCode, active: location.pathname === "/scanner" },
-    { name: "Batch Upload", path: "#", icon: FileUp, active: false },
   ];
 
   return (
@@ -85,14 +84,6 @@ export default function Layout() {
           </nav>
         </div>
         <div className="flex items-center gap-2 md:gap-4">
-          <div className="relative hidden lg:block">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-outline w-4 h-4" />
-            <input 
-              className="bg-surface-container-highest border-none rounded-lg px-4 py-2 pl-10 text-sm focus:ring-0 focus:bg-white transition-all w-64 border-b-2 border-transparent focus:border-primary" 
-              placeholder="Search logs..." 
-              type="text"
-            />
-          </div>
           <div className="relative group">
             <button className="p-2 hover:bg-slate-50 rounded-full transition-colors">
               {auth.currentUser?.photoURL ? (
