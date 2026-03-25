@@ -53,6 +53,18 @@
         }
       },
       "required": ["userId", "url", "status", "timestamp"]
+    },
+    "DomainAction": {
+      "title": "DomainAction",
+      "description": "User action to whitelist or block a domain",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string", "description": "UID of the user who performed the action" },
+        "domain": { "type": "string", "description": "The domain being whitelisted or blocked" },
+        "action": { "type": "string", "enum": ["WHITELIST", "BLOCK"], "description": "The action taken" },
+        "timestamp": { "type": "string", "format": "date-time", "description": "When the action was performed" }
+      },
+      "required": ["userId", "domain", "action", "timestamp"]
     }
   },
   "firestore": {
@@ -63,6 +75,10 @@
     "/scans/{scanId}": {
       "schema": "Scan",
       "description": "Individual scan records"
+    },
+    "/domain_actions/{actionId}": {
+      "schema": "DomainAction",
+      "description": "User actions on domains"
     }
   }
 }

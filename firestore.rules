@@ -26,6 +26,14 @@ service cloud.firestore {
     //   - timestamp: timestamp (required) - Scan time
     //   - threatDetails: map (optional) - Detailed threat analysis
     //
+    // Collection: domain_actions
+    // Document ID: actionId (Auto-generated)
+    // Fields:
+    //   - userId: string (required) - UID of the user who performed the action
+    //   - domain: string (required) - The domain being whitelisted or blocked
+    //   - action: string (required, enum: ['WHITELIST', 'BLOCK']) - The action taken
+    //   - timestamp: timestamp (required) - When the action was performed
+    //
     // ===============================================================
 
     // ===============================================================
@@ -83,6 +91,14 @@ service cloud.firestore {
              data.timestamp is timestamp;
     }
 
+    function isValidDomainAction(data) {
+      return hasRequiredFields(['userId', 'domain', 'action', 'timestamp']) &&
+             data.userId == request.auth.uid &&
+             data.domain is string &&
+             data.action in ['WHITELIST', 'BLOCK'] &&
+             data.timestamp is timestamp;
+    }
+
     // ===============================================================
     // Rules
     // ===============================================================
@@ -97,6 +113,13 @@ service cloud.firestore {
       allow read: if isDocOwner() || isAdmin();
       allow create: if isAuthenticated() && isValidScan(request.resource.data);
       allow update: if isAdmin(); // Only admins can update scan status/details
+      allow delete: if isAdmin();
+    }
+
+    match /domain_actions/{actionId} {
+      allow read: if isDocOwner() || isAdmin();
+      allow create: if isAuthenticated() && isValidDomainAction(request.resource.data);
+      allow update: if isAdmin();
       allow delete: if isAdmin();
     }
 

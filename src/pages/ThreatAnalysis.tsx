@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { db, OperationType, handleFirestoreError } from "../firebase";
-import { doc, getDoc } from "firebase/firestore";
+import { db, auth, OperationType, handleFirestoreError } from "../firebase";
+import { doc, getDoc, collection, addDoc, serverTimestamp } from "firebase/firestore";
 import { ScanRecord } from "../types";
 import { ShieldAlert, ShieldCheck, ShieldEllipsis, Bug, Globe, Database, MapPin, Search, Activity } from "lucide-react";
 import { cn } from "../lib/utils";
@@ -11,6 +11,8 @@ export default function ThreatAnalysis() {
   const navigate = useNavigate();
   const [scan, setScan] = useState<ScanRecord | null>(null);
   const [loading, setLoading] = useState(true);
+  const [actionLoading, setActionLoading] = useState(false);
+  const [actionDone, setActionDone] = useState(false);
 
   useEffect(() => {
     const fetchScan = async () => {
@@ -45,6 +47,37 @@ export default function ThreatAnalysis() {
   const isMalicious = scan.status === "MALICIOUS";
   const isSuspicious = scan.status === "SUSPICIOUS";
 
+  const handleDomainAction = async () => {
+    if (!scan || !auth.currentUser || actionLoading || actionDone) return;
+
+    setActionLoading(true);
+    try {
+      let domain = "";
+      try {
+        const url = new URL(scan.url);
+        domain = url.hostname;
+      } catch (e) {
+        // Fallback for non-standard URLs
+        domain = scan.url.replace(/^(?:https?:\/\/)?(?:www\.)?/i, "").split('/')[0];
+      }
+
+      const action = isMalicious ? "BLOCK" : "WHITELIST";
+
+      await addDoc(collection(db, "domain_actions"), {
+        userId: auth.currentUser.uid,
+        domain,
+        action,
+        timestamp: serverTimestamp()
+      });
+
+      setActionDone(true);
+    } catch (error) {
+      handleFirestoreError(error, OperationType.CREATE, "domain_actions");
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
   return (
     <div className="max-w-7xl mx-auto w-full px-4 md:px-0">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-8 md:mb-12 gap-6">
@@ -68,11 +101,27 @@ export default function ThreatAnalysis() {
           </p>
         </div>
         <div className="flex flex-wrap gap-3 w-full md:w-auto">
-          <button className={cn(
-            "flex-1 md:flex-none px-4 md:px-6 py-2.5 md:py-3 font-semibold rounded-md shadow-lg transition-all text-sm",
-            isMalicious ? "bg-error text-white shadow-error/20" : "bg-primary text-white shadow-primary/20"
-          )}>
-            {isMalicious ? "Block Domain" : "Whitelist Domain"}
+          <button 
+            onClick={handleDomainAction}
+            disabled={actionLoading || actionDone}
+            className={cn(
+              "flex-1 md:flex-none px-4 md:px-6 py-2.5 md:py-3 font-semibold rounded-md shadow-lg transition-all text-sm flex items-center justify-center gap-2",
+              isMalicious 
+                ? (actionDone ? "bg-slate-500 text-white" : "bg-error text-white shadow-error/20 hover:bg-error/90") 
+                : (actionDone ? "bg-slate-500 text-white" : "bg-primary text-white shadow-primary/20 hover:bg-primary/90"),
+              (actionLoading || actionDone) && "opacity-70 cursor-not-allowed"
+            )}
+          >
+            {actionLoading ? (
+              <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+            ) : actionDone ? (
+              <>
+                <ShieldCheck className="w-4 h-4" />
+                {isMalicious ? "Domain Blocked" : "Domain Whitelisted"}
+              </>
+            ) : (
+              isMalicious ? "Block Domain" : "Whitelist Domain"
+            )}
           </button>
         </div>
       </div>
