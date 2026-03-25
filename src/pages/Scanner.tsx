@@ -96,13 +96,18 @@ export default function Scanner() {
           malwareVectors: [
             { 
               name: "VirusTotal Engine", 
-              status: status, 
-              description: vtData.details || "Automated scan performed against global threat databases." 
+              status: vtData.engines?.virusTotal?.status || status, 
+              description: vtData.engines?.virusTotal?.details || vtData.details 
             },
             { 
-              name: "Heuristic Analysis", 
-              status: status === "MALICIOUS" ? "SUSPICIOUS" : "SAFE", 
-              description: "Pattern-based detection for zero-day exploits." 
+              name: "Google Safe Browsing", 
+              status: vtData.engines?.googleSafeBrowsing?.status || status, 
+              description: vtData.engines?.googleSafeBrowsing?.details || "Consensus analysis performed." 
+            },
+            { 
+              name: "Urlscan.io Engine", 
+              status: vtData.engines?.urlScan?.status || status, 
+              description: vtData.engines?.urlScan?.details || "Consensus analysis performed." 
             }
           ],
           riskFactors: {
@@ -153,11 +158,11 @@ export default function Scanner() {
       return;
     }
 
-    setScanning(true);
-    isScanningRef.current = true;
     try {
-      const html5QrCode = new Html5Qrcode("reader");
+      const html5QrCode = new Html5Qrcode("file-scanner-buffer");
+      setScanning(true);
       const decodedText = await html5QrCode.scanFile(file, true);
+      // We don't set isScanningRef here, analyzeUrl will handle it
       await analyzeUrl(decodedText, "File Upload (VirusTotal)");
     } catch (err) {
       console.error("Error scanning file", err);
@@ -190,12 +195,12 @@ export default function Scanner() {
       return;
     }
 
-    setScanning(true);
-    isScanningRef.current = true;
     try {
       // We use a separate instance for file scanning to avoid conflicts with the active scanner UI
-      const html5QrCode = new Html5Qrcode("reader");
+      const html5QrCode = new Html5Qrcode("file-scanner-buffer");
+      setScanning(true);
       const decodedText = await html5QrCode.scanFile(file, true);
+      // We don't set isScanningRef here, analyzeUrl will handle it
       await analyzeUrl(decodedText, "File Upload (VirusTotal)");
     } catch (err) {
       console.error("Error scanning dropped file", err);
@@ -239,6 +244,7 @@ export default function Scanner() {
             isDragging ? "border-[#00B8D4]" : "border-white"
           )}>
             <div id="reader" className="w-full h-full"></div>
+            <div id="file-scanner-buffer" className="hidden"></div>
             
             {cameraError && (
               <div className="absolute inset-0 bg-slate-900 flex flex-col items-center justify-center p-8 text-center z-30">

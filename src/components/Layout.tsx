@@ -191,8 +191,8 @@ export default function Layout() {
       <footer className="bg-slate-50 dark:bg-slate-950 flex flex-col md:flex-row justify-between items-center w-full px-8 py-12 max-w-full relative z-10">
         <div className="max-w-7xl mx-auto w-full flex flex-col md:flex-row justify-between items-center gap-8">
           <div className="flex flex-col gap-2">
-            <span className="text-lg font-bold text-slate-900 dark:text-white font-headline">CyberQR Enterprise</span>
-            <span className="text-slate-600 dark:text-slate-400 font-body text-sm">© 2024 CyberQR Enterprise. All rights reserved.</span>
+            <span className="text-lg font-bold text-slate-900 dark:text-white font-headline">CyberQR</span>
+            <span className="text-slate-600 dark:text-slate-400 font-body text-sm">© 2026 Proyecto de Ingeniería de Software II</span>
           </div>
         </div>
       </footer>

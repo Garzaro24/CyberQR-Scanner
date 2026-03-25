@@ -202,19 +202,19 @@ export default function ThreatAnalysis() {
 
         {/* Malware Breakdown */}
         <div className="col-span-12 lg:col-span-7 bg-white rounded-xl p-6 md:p-8">
-          <h3 className="font-headline text-lg md:text-xl font-bold mb-6 md:mb-8">Malware Vector Details</h3>
+          <h3 className="font-headline text-lg md:text-xl font-bold mb-6 md:mb-8">Consensus Engine Results</h3>
           <div className="space-y-6 md:space-y-8">
             {scan.threatDetails?.malwareVectors.map((vector, idx) => (
               <div key={idx} className="flex gap-4 md:gap-6 items-start">
                 <div className="bg-primary/10 p-2 md:p-3 rounded-lg text-[#006879] shrink-0">
-                  {idx === 0 ? <Bug className="w-5 h-5 md:w-6 md:h-6" /> : idx === 1 ? <Activity className="w-5 h-5 md:w-6 md:h-6" /> : <Database className="w-5 h-5 md:w-6 md:h-6" />}
+                  {vector.name.includes("VirusTotal") ? <ShieldAlert className="w-5 h-5 md:w-6 md:h-6" /> : vector.name.includes("Google") ? <Globe className="w-5 h-5 md:w-6 md:h-6" /> : <Search className="w-5 h-5 md:w-6 md:h-6" />}
                 </div>
                 <div className="flex-grow">
                   <div className="flex justify-between items-center mb-1">
                     <h4 className="font-bold text-sm md:text-base">{vector.name}</h4>
                     <span className={cn(
                       "text-[10px] font-bold font-label px-2 py-0.5 rounded",
-                      vector.status === "MALICIOUS" ? "bg-error/10 text-error" : "bg-emerald-500/10 text-emerald-500"
+                      vector.status === "MALICIOUS" ? "bg-error/10 text-error" : vector.status === "SUSPICIOUS" ? "bg-warning/10 text-warning" : "bg-emerald-500/10 text-emerald-500"
                     )}>{vector.status}</span>
                   </div>
                   <p className="text-xs md:text-sm text-on-surface-variant leading-relaxed">{vector.description}</p>
