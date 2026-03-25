@@ -103,7 +103,7 @@ export default function Settings() {
                 {user?.email}
               </p>
               <div className="flex items-center gap-2 mt-2">
-                <span className="px-2 py-0.5 bg-primary/10 text-primary text-[10px] md:text-xs font-bold rounded uppercase tracking-widest">Nivel de Autorización 4</span>
+                <span className="px-2 py-0.5 bg-primary/10 text-primary text-[10px] md:text-xs font-bold rounded uppercase tracking-widest">Acceso Verificado</span>
                 <span className="px-2 py-0.5 bg-emerald-500/10 text-emerald-500 text-[10px] md:text-xs font-bold rounded uppercase tracking-widest">Estado Activo</span>
               </div>
             </div>

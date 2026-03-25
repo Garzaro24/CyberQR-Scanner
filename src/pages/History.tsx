@@ -75,7 +75,7 @@ export default function History() {
             <h2 className="font-headline text-3xl md:text-4xl font-bold text-on-surface">{stats.total.toLocaleString()}</h2>
           </div>
           <div className="flex items-center gap-2 mt-4 text-emerald-600">
-            <span className="text-[10px] md:text-xs font-bold font-headline">+12% vs el mes pasado</span>
+            <span className="text-[10px] md:text-xs font-bold font-headline uppercase tracking-wider">Vigilancia Activa</span>
           </div>
         </div>
         <div className="bg-white p-6 md:p-8 rounded-xl flex flex-col justify-between border-l-4 border-error shadow-sm">
@@ -84,7 +84,7 @@ export default function History() {
             <h2 className="font-headline text-3xl md:text-4xl font-bold text-on-surface">{stats.blocked.toLocaleString()}</h2>
           </div>
           <div className="flex items-center gap-2 mt-4 text-error">
-            <span className="text-[10px] md:text-xs font-bold font-headline">Escudo de Perímetro Activo</span>
+            <span className="text-[10px] md:text-xs font-bold font-headline uppercase tracking-wider">Escudo de Perímetro</span>
           </div>
         </div>
         <div className="bg-white p-6 md:p-8 rounded-xl flex flex-col justify-between border-l-4 border-warning shadow-sm">
@@ -93,7 +93,7 @@ export default function History() {
             <h2 className="font-headline text-3xl md:text-4xl font-bold text-on-surface">{stats.suspicious.toLocaleString()}</h2>
           </div>
           <div className="flex items-center gap-2 mt-4 text-warning">
-            <span className="text-[10px] md:text-xs font-bold font-headline">Detección de Anomalías Heurística</span>
+            <span className="text-[10px] md:text-xs font-bold font-headline uppercase tracking-wider">Detección Heurística</span>
           </div>
         </div>
         <div className="bg-white p-6 md:p-8 rounded-xl flex flex-col justify-between border-l-4 border-[#10B981] shadow-sm">
@@ -102,7 +102,7 @@ export default function History() {
             <h2 className="font-headline text-3xl md:text-4xl font-bold text-on-surface">{stats.safe.toLocaleString()}</h2>
           </div>
           <div className="flex items-center gap-2 mt-4 text-[#006879]">
-            <span className="text-[10px] md:text-xs font-bold font-headline">98.9% Tasa de Éxito</span>
+            <span className="text-[10px] md:text-xs font-bold font-headline uppercase tracking-wider">Verificación Completa</span>
           </div>
         </div>
       </div>

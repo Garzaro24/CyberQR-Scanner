@@ -177,16 +177,18 @@ export default function ThreatAnalysis() {
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 md:gap-6">
             <div className="space-y-1">
-              <span className="font-label text-[10px] md:text-xs text-on-surface-variant">Antigüedad del Dominio</span>
-              <p className="font-medium text-sm md:text-base">2 Días</p>
+              <span className="font-label text-[10px] md:text-xs text-on-surface-variant">Dirección IP</span>
+              <p className="font-medium text-sm md:text-base">{scan.location?.ip || "Desconocida"}</p>
             </div>
             <div className="space-y-1">
-              <span className="font-label text-[10px] md:text-xs text-on-surface-variant">Registrador</span>
-              <p className="font-medium text-sm md:text-base">Privacidad Protegida</p>
+              <span className="font-label text-[10px] md:text-xs text-on-surface-variant">Organización</span>
+              <p className="font-medium text-sm md:text-base">{scan.location?.org || "Privacidad Protegida"}</p>
             </div>
             <div className="space-y-1">
               <span className="font-label text-[10px] md:text-xs text-on-surface-variant">Ubicación del Servidor</span>
-              <p className="font-medium text-sm md:text-base">Vilna, Lituania</p>
+              <p className="font-medium text-sm md:text-base">
+                {scan.location?.city ? `${scan.location.city}, ${scan.location.country}` : "Desconocida"}
+              </p>
             </div>
           </div>
           {isMalicious && (
@@ -269,20 +271,6 @@ export default function ThreatAnalysis() {
               <p className="text-[10px] text-on-surface-variant italic leading-relaxed">
                 * Los valores de los factores pueden variar ligeramente entre escaneos debido a la medición de latencia de red en tiempo real y actualizaciones dinámicas de los motores de seguridad globales.
               </p>
-            </div>
-            <div className="mt-8 md:mt-10 p-4 md:p-6 bg-white rounded-xl shadow-sm space-y-4">
-              <h4 className="font-bold text-xs md:text-sm">Mapa de Origen</h4>
-              <div className="h-24 md:h-32 rounded-lg bg-surface-container-high relative overflow-hidden">
-                <img 
-                  className="w-full h-full object-cover grayscale opacity-50" 
-                  src="https://lh3.googleusercontent.com/aida-public/AB6AXuBP8JTX7CYzLyNO7yMUbxT2Hfxfu9P2DnIpBLBGprg4_deGrQhJcOvi4WiqBPM80XXLVv9dO8jwDWmhP4JA_EplPlyJo1dzoHv-jdAADhB33lHjFOn905tfVLIVSE-W9GixrONYPAheiEbO03z-Bdj2EHxwp34BtJP2XoaQZ_hhuawkUKuck4CM0xtZki7cHGKZJjoLmee3D7BYNp32QmJoG1kxFM5p1siPsMwyE__l2pVLKxUn09KUJtDUj_nLLu2joi66t2NKDSU"
-                  alt="Map"
-                />
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <MapPin className="text-error w-6 h-6 md:w-8 md:h-8 fill-current" />
-                </div>
-              </div>
-              <p className="text-[10px] md:text-xs text-on-surface-variant italic">La carga útil proviene de un nodo de enrutamiento no estándar: AS12903</p>
             </div>
           </div>
         </div>

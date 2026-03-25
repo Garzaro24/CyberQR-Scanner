@@ -26,6 +26,12 @@ export interface ScanRecord {
   source: string;
   status: ScanStatus;
   timestamp: any; // Firestore Timestamp
+  location?: {
+    ip: string;
+    city: string;
+    country: string;
+    org: string;
+  };
   threatDetails?: ThreatDetails;
 }
 

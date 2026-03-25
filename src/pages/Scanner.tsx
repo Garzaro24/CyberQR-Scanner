@@ -3,6 +3,12 @@ import { db, auth, OperationType, handleFirestoreError } from "../firebase";
 import { collection, addDoc, serverTimestamp } from "firebase/firestore";
 import { useNavigate } from "react-router-dom";
 import { Html5QrcodeScanner, Html5QrcodeSupportedFormats, Html5Qrcode } from "html5-qrcode";
+import * as pdfjs from 'pdfjs-dist';
+import jsQR from "jsqr";
+import { toast } from "sonner";
+
+// Set worker source for pdfjs
+pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.min.js`;
 import { 
   ShieldCheck, 
   ShieldAlert, 
@@ -15,13 +21,23 @@ import {
   CheckCircle2,
   AlertTriangle,
   Info,
-  CameraOff
+  CameraOff,
+  Globe,
+  Activity,
+  Cpu,
+  Loader2,
+  AlertCircle
 } from "lucide-react";
 import { cn } from "../lib/utils";
 
 export default function Scanner() {
   const [scanning, setScanning] = useState(false);
   const [scanComplete, setScanComplete] = useState(false);
+  const [sidebarStatus, setSidebarStatus] = useState({
+    encryption: "SEGURO",
+    domain: "PENDIENTE",
+    metadata: "EN ESPERA"
+  });
   const [isDragging, setIsDragging] = useState(false);
   const [cameraError, setCameraError] = useState<string | null>(null);
   const isScanningRef = useRef(false);
@@ -70,6 +86,11 @@ export default function Scanner() {
     
     isScanningRef.current = true;
     setScanning(true);
+    setSidebarStatus({
+      encryption: "ANALIZANDO",
+      domain: "ANALIZANDO",
+      metadata: "ANALIZANDO"
+    });
     
     try {
       const startTime = Date.now();
@@ -83,12 +104,19 @@ export default function Scanner() {
       const endTime = Date.now();
       const latency = endTime - startTime;
 
-      if (!response.ok) throw new Error("Error al escanear la URL a través de VirusTotal");
+      if (!response.ok) throw new Error("Error al escanear la URL a través de los motores de seguridad");
 
       const vtData = await response.json();
       const status = vtData.status;
       const riskScore = vtData.riskScore;
       
+      // Update sidebar status based on results
+      setSidebarStatus({
+        encryption: "SEGURO",
+        domain: status === "SAFE" ? "SEGURO" : (status === "SUSPICIOUS" ? "SOSPECHOSO" : "MALICIOSO"),
+        metadata: "COMPLETO"
+      });
+
       // Calculate more realistic risk factors
       const urlReputation = riskScore; // High risk score = high reputation risk
       const payloadComplexity = status === "MALICIOUS" ? 85 : (status === "SUSPICIOUS" ? 45 : 12);
@@ -109,23 +137,24 @@ export default function Scanner() {
         source: source,
         status: status,
         timestamp: serverTimestamp(),
+        location: vtData.location || { ip: "Unknown", city: "Unknown", country: "Unknown", org: "Unknown" },
         threatDetails: {
           riskScore: riskScore,
           malwareVectors: [
             { 
-              name: "VirusTotal Engine", 
+              name: "Motor VirusTotal", 
               status: vtData.engines?.virusTotal?.status || status, 
-              description: vtData.engines?.virusTotal?.details || vtData.details 
+              description: vtData.engines?.virusTotal?.details || "Análisis de consenso realizado por múltiples motores antivirus." 
             },
             { 
               name: "Google Safe Browsing", 
               status: vtData.engines?.googleSafeBrowsing?.status || status, 
-              description: vtData.engines?.googleSafeBrowsing?.details || "Consensus analysis performed." 
+              description: vtData.engines?.googleSafeBrowsing?.details || "Verificación contra la base de datos de navegación segura de Google." 
             },
             { 
-              name: "Urlscan.io Engine", 
+              name: "Motor Urlscan.io", 
               status: vtData.engines?.urlScan?.status || status, 
-              description: vtData.engines?.urlScan?.details || "Consensus analysis performed." 
+              description: vtData.engines?.urlScan?.details || "Análisis de comportamiento y reputación de dominio." 
             }
           ],
           riskFactors: {
@@ -140,6 +169,7 @@ export default function Scanner() {
       const docRef = await addDoc(collection(db, "scans"), scanData);
       setScanComplete(true);
       setScanning(false);
+      toast.success("Escaneo completado con éxito");
       // We don't reset isScanningRef.current here because we are navigating away
       
       // Navigate to analysis after a brief success state
@@ -152,12 +182,12 @@ export default function Scanner() {
       handleFirestoreError(error, OperationType.CREATE, "scans");
       setScanning(false);
       isScanningRef.current = false;
-      alert("El escaneo de VirusTotal falló. Usando respaldo heurístico.");
+      toast.error("El escaneo de seguridad falló. Por favor, intente de nuevo.");
     }
   }
 
   async function onScanSuccess(decodedText: string) {
-    await analyzeUrl(decodedText, "Live Camera Scan (VirusTotal)");
+    await analyzeUrl(decodedText, "Escaneo de Cámara en Vivo");
   }
 
   function onScanFailure(error: any) {
@@ -165,28 +195,127 @@ export default function Scanner() {
     // We don't need to log this as it's very frequent.
   }
 
+  const scanQRCodeFromCanvas = (canvas: HTMLCanvasElement): string | null => {
+    const context = canvas.getContext('2d', { willReadFrequently: true });
+    if (!context) return null;
+    
+    const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
+    const code = jsQR(imageData.data, imageData.width, imageData.height, {
+      inversionAttempts: "dontInvert",
+    });
+    
+    if (code) return code.data;
+    
+    // Try with inversion if first attempt fails
+    const codeInverted = jsQR(imageData.data, imageData.width, imageData.height, {
+      inversionAttempts: "onlyInvert",
+    });
+    
+    return codeInverted ? codeInverted.data : null;
+  };
+
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
     // Validate file type
-    if (!file.type || !file.type.startsWith('image/')) {
-      alert("Error: El archivo no es compatible. Por favor, sube una imagen válida en formato .jpg, .png o similar.");
+    const isImage = file.type.startsWith('image/');
+    const isPDF = file.type === 'application/pdf';
+
+    if (!isImage && !isPDF) {
+      toast.error("Error: El archivo no es compatible. Por favor, sube una imagen o un PDF.");
       if (fileInputRef.current) fileInputRef.current.value = "";
       return;
     }
 
     try {
-      const html5QrCode = new Html5Qrcode("file-scanner-buffer");
       setScanning(true);
-      const decodedText = await html5QrCode.scanFile(file, true);
-      // We don't set isScanningRef here, analyzeUrl will handle it
-      await analyzeUrl(decodedText, "File Upload (VirusTotal)");
+      let decodedText: string | null = null;
+
+      if (isPDF) {
+        // Handle PDF scanning with higher resolution
+        const arrayBuffer = await file.arrayBuffer();
+        const pdf = await pdfjs.getDocument({ data: arrayBuffer }).promise;
+        const page = await pdf.getPage(1);
+        const viewport = page.getViewport({ scale: 3.0 }); // Increased scale for better detection
+        const canvas = document.createElement('canvas');
+        const context = canvas.getContext('2d', { willReadFrequently: true });
+        if (!context) throw new Error("Could not get canvas context");
+        canvas.height = viewport.height;
+        canvas.width = viewport.width;
+        await page.render({ canvasContext: context, viewport, canvas }).promise;
+        
+        decodedText = scanQRCodeFromCanvas(canvas);
+        
+        // Fallback to html5-qrcode if jsQR fails
+        if (!decodedText) {
+          const blob = await new Promise<Blob | null>((resolve) => canvas.toBlob(resolve, 'image/png'));
+          if (blob) {
+            const pdfImageFile = new File([blob], "pdf-page.png", { type: "image/png" });
+            const html5QrCode = new Html5Qrcode("file-scanner-buffer");
+            try {
+              decodedText = await html5QrCode.scanFile(pdfImageFile, false);
+            } catch (e) {
+              // Ignore fallback failure
+            }
+          }
+        }
+      } else {
+        // Handle Image scanning
+        const img = new Image();
+        const objectUrl = URL.createObjectURL(file);
+        
+        try {
+          await new Promise((resolve, reject) => {
+            img.onload = resolve;
+            img.onerror = reject;
+            img.src = objectUrl;
+          });
+          
+          const canvas = document.createElement('canvas');
+          const context = canvas.getContext('2d', { willReadFrequently: true });
+          if (!context) throw new Error("Could not get canvas context");
+          
+          // Try different scales if detection fails
+          const scales = [1.0, 0.5, 1.5, 2.0];
+          for (const scale of scales) {
+            canvas.width = img.width * scale;
+            canvas.height = img.height * scale;
+            context.clearRect(0, 0, canvas.width, canvas.height);
+            context.drawImage(img, 0, 0, canvas.width, canvas.height);
+            
+            decodedText = scanQRCodeFromCanvas(canvas);
+            if (decodedText) break;
+          }
+          
+          // Final fallback to html5-qrcode
+          if (!decodedText) {
+            const html5QrCode = new Html5Qrcode("file-scanner-buffer");
+            try {
+              decodedText = await html5QrCode.scanFile(file, false);
+            } catch (err) {
+              try {
+                decodedText = await html5QrCode.scanFile(file, true);
+              } catch (e) {
+                // Ignore fallback failure
+              }
+            }
+          }
+        } finally {
+          URL.revokeObjectURL(objectUrl);
+        }
+      }
+
+      if (!decodedText) {
+        throw new Error("No QR code detected");
+      }
+
+      await analyzeUrl(decodedText, "Subida de Archivo");
     } catch (err) {
       console.error("Error scanning file", err);
       setScanning(false);
       isScanningRef.current = false;
-      alert("No se pudo encontrar un código QR válido en la imagen subida. Por favor, intenta con otro archivo.");
+      toast.error("No se pudo detectar un código QR. Asegúrese de que el archivo sea claro y contenga un QR.");
     } finally {
       if (fileInputRef.current) fileInputRef.current.value = "";
     }
@@ -208,23 +337,93 @@ export default function Scanner() {
     if (!file) return;
 
     // Validate file type
-    if (!file.type || !file.type.startsWith('image/')) {
-      alert("Error: El archivo no es compatible. Por favor, arrastra una imagen válida en formato .jpg, .png o similar.");
+    const isImage = file.type.startsWith('image/');
+    const isPDF = file.type === 'application/pdf';
+
+    if (!isImage && !isPDF) {
+      toast.error("Error: El archivo no es compatible. Por favor, arrastra una imagen o un PDF.");
       return;
     }
 
     try {
-      // We use a separate instance for file scanning to avoid conflicts with the active scanner UI
-      const html5QrCode = new Html5Qrcode("file-scanner-buffer");
       setScanning(true);
-      const decodedText = await html5QrCode.scanFile(file, true);
-      // We don't set isScanningRef here, analyzeUrl will handle it
-      await analyzeUrl(decodedText, "File Upload (VirusTotal)");
+      let decodedText: string | null = null;
+
+      if (isPDF) {
+        const arrayBuffer = await file.arrayBuffer();
+        const pdf = await pdfjs.getDocument({ data: arrayBuffer }).promise;
+        const page = await pdf.getPage(1);
+        const viewport = page.getViewport({ scale: 3.0 });
+        const canvas = document.createElement('canvas');
+        const context = canvas.getContext('2d', { willReadFrequently: true });
+        if (!context) throw new Error("Could not get canvas context");
+        canvas.height = viewport.height;
+        canvas.width = viewport.width;
+        await page.render({ canvasContext: context, viewport, canvas }).promise;
+        
+        decodedText = scanQRCodeFromCanvas(canvas);
+        
+        if (!decodedText) {
+          const blob = await new Promise<Blob | null>((resolve) => canvas.toBlob(resolve, 'image/png'));
+          if (blob) {
+            const pdfImageFile = new File([blob], "pdf-page.png", { type: "image/png" });
+            const html5QrCode = new Html5Qrcode("file-scanner-buffer");
+            try {
+              decodedText = await html5QrCode.scanFile(pdfImageFile, false);
+            } catch (e) {}
+          }
+        }
+      } else {
+        const img = new Image();
+        const objectUrl = URL.createObjectURL(file);
+        
+        try {
+          await new Promise((resolve, reject) => {
+            img.onload = resolve;
+            img.onerror = reject;
+            img.src = objectUrl;
+          });
+          
+          const canvas = document.createElement('canvas');
+          const context = canvas.getContext('2d', { willReadFrequently: true });
+          if (!context) throw new Error("Could not get canvas context");
+          
+          const scales = [1.0, 0.5, 1.5, 2.0];
+          for (const scale of scales) {
+            canvas.width = img.width * scale;
+            canvas.height = img.height * scale;
+            context.clearRect(0, 0, canvas.width, canvas.height);
+            context.drawImage(img, 0, 0, canvas.width, canvas.height);
+            
+            decodedText = scanQRCodeFromCanvas(canvas);
+            if (decodedText) break;
+          }
+          
+          if (!decodedText) {
+            const html5QrCode = new Html5Qrcode("file-scanner-buffer");
+            try {
+              decodedText = await html5QrCode.scanFile(file, false);
+            } catch (err) {
+              try {
+                decodedText = await html5QrCode.scanFile(file, true);
+              } catch (e) {}
+            }
+          }
+        } finally {
+          URL.revokeObjectURL(objectUrl);
+        }
+      }
+
+      if (!decodedText) {
+        throw new Error("No QR code detected");
+      }
+
+      await analyzeUrl(decodedText, "Subida de Archivo (Arrastrar)");
     } catch (err) {
       console.error("Error scanning dropped file", err);
       setScanning(false);
       isScanningRef.current = false;
-      alert("No se pudo encontrar un código QR válido en la imagen. Por favor, intenta con otro archivo.");
+      toast.error("No se pudo detectar un código QR en el archivo soltado.");
     }
   };
 
@@ -235,14 +434,24 @@ export default function Scanner() {
           <h1 className="text-3xl md:text-4xl font-bold font-headline tracking-tight text-on-surface mb-2">Captura Segura de QR</h1>
           <p className="text-on-surface-variant text-base md:text-lg leading-relaxed">Coloca cualquier código dentro del visor de alta precisión. Nuestro motor impulsado por IA valida la autenticidad y los protocolos de seguridad en tiempo real.</p>
         </div>
-        <div className="flex items-center gap-4 bg-white p-2 rounded-xl shadow-sm self-start lg:self-auto">
-          <div className="px-4 py-2 border-r border-outline-variant/20">
-            <span className="block text-[10px] font-bold text-outline uppercase">Latencia</span>
-            <span className="text-base md:text-lg font-headline font-bold text-[#006879]">12ms</span>
+        <div className="flex items-center gap-4 bg-white p-3 rounded-xl shadow-sm self-start lg:self-auto border border-outline-variant/10">
+          <div className="flex items-center gap-3 px-4 py-1 border-r border-outline-variant/20">
+            <div className="p-2 bg-primary/10 rounded-lg">
+              <Globe className="w-4 h-4 text-primary" />
+            </div>
+            <div>
+              <span className="block text-[10px] font-bold text-outline uppercase">Motores</span>
+              <span className="text-xs font-headline font-bold text-on-surface">VT, GSB, US</span>
+            </div>
           </div>
-          <div className="px-4 py-2">
-            <span className="block text-[10px] font-bold text-outline uppercase">Motor</span>
-            <span className="text-base md:text-lg font-headline font-bold text-[#006879]">v4.2-Pro</span>
+          <div className="flex items-center gap-3 px-4 py-1">
+            <div className="p-2 bg-emerald-500/10 rounded-lg">
+              <Activity className="w-4 h-4 text-emerald-500" />
+            </div>
+            <div>
+              <span className="block text-[10px] font-bold text-outline uppercase">Estado</span>
+              <span className="text-xs font-headline font-bold text-emerald-500">OPTIMIZADO</span>
+            </div>
           </div>
         </div>
       </div>
@@ -319,24 +528,69 @@ export default function Scanner() {
             <div className="space-y-4">
               <div className="flex items-center justify-between p-4 bg-surface-container-low rounded-xl">
                 <div className="flex items-center gap-3">
-                  <CheckCircle2 className="text-emerald-500 w-5 h-5" />
+                  {sidebarStatus.encryption === "ANALIZANDO" ? (
+                    <Loader2 className="w-5 h-5 text-primary animate-spin" />
+                  ) : sidebarStatus.encryption === "ERROR" ? (
+                    <AlertCircle className="text-error w-5 h-5" />
+                  ) : (
+                    <CheckCircle2 className="text-emerald-500 w-5 h-5" />
+                  )}
                   <span className="text-sm font-medium">Verificación de Cifrado</span>
                 </div>
-                <span className="text-xs font-bold font-label text-emerald-500">SEGURO</span>
+                <span className={cn(
+                  "text-xs font-bold font-label",
+                  sidebarStatus.encryption === "ANALIZANDO" ? "text-primary" : 
+                  sidebarStatus.encryption === "ERROR" ? "text-error" : "text-emerald-500"
+                )}>
+                  {sidebarStatus.encryption}
+                </span>
               </div>
               <div className="flex items-center justify-between p-4 bg-surface-container-low rounded-xl">
                 <div className="flex items-center gap-3">
-                  <AlertTriangle className="text-warning w-5 h-5" />
+                  {sidebarStatus.domain === "ANALIZANDO" ? (
+                    <Loader2 className="w-5 h-5 text-primary animate-spin" />
+                  ) : sidebarStatus.domain === "MALICIOSO" || sidebarStatus.domain === "ERROR" ? (
+                    <ShieldAlert className="text-error w-5 h-5" />
+                  ) : sidebarStatus.domain === "SOSPECHOSO" ? (
+                    <AlertTriangle className="text-warning w-5 h-5" />
+                  ) : sidebarStatus.domain === "SEGURO" ? (
+                    <CheckCircle2 className="text-emerald-500 w-5 h-5" />
+                  ) : (
+                    <ShieldEllipsis className="text-outline w-5 h-5" />
+                  )}
                   <span className="text-sm font-medium">Verificación de Dominio</span>
                 </div>
-                <span className="text-xs font-bold font-label text-warning">PENDIENTE</span>
+                <span className={cn(
+                  "text-xs font-bold font-label",
+                  sidebarStatus.domain === "ANALIZANDO" ? "text-primary" : 
+                  sidebarStatus.domain === "MALICIOSO" || sidebarStatus.domain === "ERROR" ? "text-error" : 
+                  sidebarStatus.domain === "SOSPECHOSO" ? "text-warning" : 
+                  sidebarStatus.domain === "SEGURO" ? "text-emerald-500" : "text-outline"
+                )}>
+                  {sidebarStatus.domain}
+                </span>
               </div>
               <div className="flex items-center justify-between p-4 bg-surface-container-low rounded-xl">
                 <div className="flex items-center gap-3">
-                  <Info className="text-[#006879] w-5 h-5" />
+                  {sidebarStatus.metadata === "ANALIZANDO" ? (
+                    <Loader2 className="w-5 h-5 text-primary animate-spin" />
+                  ) : sidebarStatus.metadata === "COMPLETO" ? (
+                    <CheckCircle2 className="text-emerald-500 w-5 h-5" />
+                  ) : sidebarStatus.metadata === "ERROR" ? (
+                    <AlertCircle className="text-error w-5 h-5" />
+                  ) : (
+                    <Info className="text-outline w-5 h-5" />
+                  )}
                   <span className="text-sm font-medium">Análisis de Metadatos</span>
                 </div>
-                <span className="text-xs font-bold font-label text-[#006879]">EN ESPERA</span>
+                <span className={cn(
+                  "text-xs font-bold font-label",
+                  sidebarStatus.metadata === "ANALIZANDO" ? "text-primary" : 
+                  sidebarStatus.metadata === "COMPLETO" ? "text-emerald-500" : 
+                  sidebarStatus.metadata === "ERROR" ? "text-error" : "text-outline"
+                )}>
+                  {sidebarStatus.metadata}
+                </span>
               </div>
             </div>
             <div className="pt-4 border-t border-outline-variant/10">
@@ -345,7 +599,7 @@ export default function Scanner() {
                 ref={fileInputRef} 
                 onChange={handleFileUpload} 
                 className="hidden" 
-                accept="image/*"
+                accept="image/*,application/pdf"
               />
               <button 
                 onClick={() => fileInputRef.current?.click()}

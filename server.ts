@@ -153,10 +153,34 @@ async function startServer() {
       // Combine details
       const combinedDetails = successfulResults.map(r => r.details).join(" | ");
 
+      // Resolve IP and Location
+      let ipData = { ip: "Unknown", city: "Unknown", country: "Unknown", org: "Unknown" };
+      try {
+        const urlObj = new URL(url.startsWith('http') ? url : `https://${url}`);
+        const hostname = urlObj.hostname;
+        // Use a free GeoIP API (ip-api.com)
+        // Note: In a real app, we'd resolve hostname to IP first, but ip-api can take a hostname
+        const geoResponse = await fetchWithTimeout(`http://ip-api.com/json/${hostname}?fields=status,message,country,city,org,query`);
+        if (geoResponse.ok) {
+          const geo = await geoResponse.json();
+          if (geo.status === "success") {
+            ipData = {
+              ip: geo.query,
+              city: geo.city,
+              country: geo.country,
+              org: geo.org
+            };
+          }
+        }
+      } catch (e) {
+        console.error("GeoIP Error:", e);
+      }
+
       res.json({
         status: finalStatus,
         riskScore: finalRiskScore,
         details: combinedDetails,
+        location: ipData,
         engines: {
           virusTotal: successfulResults[0],
           googleSafeBrowsing: successfulResults[1],

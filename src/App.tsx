@@ -1,5 +1,6 @@
 import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { Toaster } from "sonner";
 import { ErrorBoundary } from "./components/ErrorBoundary";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Layout from "./components/Layout";
@@ -13,6 +14,7 @@ import ResetPassword from "./pages/ResetPassword";
 export default function App() {
   return (
     <ErrorBoundary>
+      <Toaster position="top-right" expand={false} richColors />
       <Router>
         <Routes>
           <Route path="/login" element={<Login />} />
