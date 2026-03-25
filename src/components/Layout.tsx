@@ -191,18 +191,6 @@ export default function Layout() {
               </Link>
             ))}
           </div>
-          <div className="mt-auto p-4 bg-white rounded-xl shadow-sm">
-            <div className="flex items-center gap-3 mb-3">
-              <div className="relative flex items-center justify-center w-6 h-6 border-2 border-[#00B8D4] rounded-full">
-                <div className="w-2 h-2 bg-[#00B8D4] rounded-full"></div>
-              </div>
-              <span className="text-sm font-semibold font-headline">System Online</span>
-            </div>
-            <div className="text-[10px] text-outline uppercase font-bold tracking-tighter mb-1">Encrypted Tunnel</div>
-            <div className="h-1 w-full bg-surface-container-highest rounded-full overflow-hidden">
-              <div className="h-full bg-[#00B8D4] w-[85%]"></div>
-            </div>
-          </div>
         </aside>
 
         {/* Main Content Area */}
@@ -217,11 +205,6 @@ export default function Layout() {
           <div className="flex flex-col gap-2">
             <span className="text-lg font-bold text-slate-900 dark:text-white font-headline">CyberQR Enterprise</span>
             <span className="text-slate-600 dark:text-slate-400 font-body text-sm">© 2024 CyberQR Enterprise. All rights reserved.</span>
-          </div>
-          <div className="flex gap-8">
-            <a className="text-slate-600 dark:text-slate-400 hover:text-[#00B8D4] transition-all font-body text-sm" href="#">Privacy Policy</a>
-            <a className="text-slate-600 dark:text-slate-400 hover:text-[#00B8D4] transition-all font-body text-sm" href="#">Documentation</a>
-            <a className="text-slate-600 dark:text-slate-400 hover:text-[#00B8D4] transition-all font-body text-sm" href="#">Support Center</a>
           </div>
         </div>
       </footer>

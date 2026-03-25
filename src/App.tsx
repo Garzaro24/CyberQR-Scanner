@@ -9,6 +9,7 @@ import Scanner from "./pages/Scanner";
 import History from "./pages/History";
 import ThreatAnalysis from "./pages/ThreatAnalysis";
 import Settings from "./pages/Settings";
+import ResetPassword from "./pages/ResetPassword";
 
 export default function App() {
   return (
@@ -16,6 +17,7 @@ export default function App() {
       <Router>
         <Routes>
           <Route path="/login" element={<Login />} />
+          <Route path="/reset-password" element={<ResetPassword />} />
           <Route
             path="/"
             element={
