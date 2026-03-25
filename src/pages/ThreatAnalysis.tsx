@@ -88,16 +88,16 @@ export default function ThreatAnalysis() {
           )}>
             {isMalicious ? <ShieldAlert className="w-4 h-4" /> : isSuspicious ? <ShieldEllipsis className="w-4 h-4" /> : <ShieldCheck className="w-4 h-4" />}
             <span className="font-label uppercase tracking-widest text-[10px]">
-              {isMalicious ? "Critical Security Alert" : isSuspicious ? "Security Warning" : "Security Verification"}
+              {isMalicious ? "Alerta de Seguridad Crítica" : isSuspicious ? "Advertencia de Seguridad" : "Verificación de Seguridad"}
             </span>
           </div>
-          <h1 className="font-headline text-3xl md:text-4xl font-bold tracking-tight text-on-surface">Threat Analysis Report</h1>
+          <h1 className="font-headline text-3xl md:text-4xl font-bold tracking-tight text-on-surface">Informe de Análisis de Amenazas</h1>
           <p className="text-on-surface-variant text-sm md:text-base max-w-xl">
             {isMalicious 
-              ? "Deep inspection of QR-encoded payload detected malicious redirection sequences targeting financial infrastructure."
+              ? "La inspección profunda de la carga útil codificada en QR detectó secuencias de redirección maliciosas dirigidas a infraestructuras financieras."
               : isSuspicious
-              ? "Potential risk detected in the redirection sequence. Manual verification recommended."
-              : "No threats detected. The payload and destination have been verified against our global security database."}
+              ? "Riesgo potencial detectado en la secuencia de redirección. Se recomienda verificación manual."
+              : "No se detectaron amenazas. La carga útil y el destino han sido verificados contra nuestra base de datos de seguridad global."}
           </p>
         </div>
         <div className="flex flex-wrap gap-3 w-full md:w-auto">
@@ -117,10 +117,10 @@ export default function ThreatAnalysis() {
             ) : actionDone ? (
               <>
                 <ShieldCheck className="w-4 h-4" />
-                {isMalicious ? "Domain Blocked" : "Domain Whitelisted"}
+                {isMalicious ? "Dominio Bloqueado" : "Dominio en Lista Blanca"}
               </>
             ) : (
-              isMalicious ? "Block Domain" : "Whitelist Domain"
+              isMalicious ? "Bloquear Dominio" : "Permitir Dominio"
             )}
           </button>
         </div>
@@ -132,7 +132,7 @@ export default function ThreatAnalysis() {
           <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
             <ShieldAlert className="w-16 h-16 md:w-24 md:h-24" />
           </div>
-          <span className="font-label uppercase tracking-tighter text-on-surface-variant mb-4 text-xs">Cumulative Risk Score</span>
+          <span className="font-label uppercase tracking-tighter text-on-surface-variant mb-4 text-xs">Puntuación de Riesgo Acumulada</span>
           <div className="relative">
             <span className={cn(
               "font-headline text-[80px] md:text-[120px] font-bold leading-none tracking-tighter",
@@ -150,7 +150,7 @@ export default function ThreatAnalysis() {
               "font-bold text-base md:text-lg",
               isMalicious ? "text-error" : isSuspicious ? "text-warning" : "text-emerald-500"
             )}>
-              {isMalicious ? "CRITICAL THREAT" : isSuspicious ? "SUSPICIOUS ACTIVITY" : "VERIFIED SECURE"}
+              {isMalicious ? "AMENAZA CRÍTICA" : isSuspicious ? "ACTIVIDAD SOSPECHOSA" : "VERIFICADO SEGURO"}
             </span>
             <div className="h-1 w-32 bg-surface-container-high rounded-full overflow-hidden">
               <div className={cn(
@@ -164,7 +164,7 @@ export default function ThreatAnalysis() {
         {/* Target URL Analysis */}
         <div className="col-span-12 lg:col-span-8 bg-white rounded-xl p-6 md:p-8 space-y-6">
           <div className="flex justify-between items-center">
-            <h3 className="font-headline text-lg md:text-xl font-bold">Target URL Analysis</h3>
+            <h3 className="font-headline text-lg md:text-xl font-bold">Análisis de URL de Destino</h3>
             <div className="relative flex items-center justify-center w-5 h-5 md:w-6 md:h-6 border-2 border-[#00B8D4] rounded-full">
               <div className="w-1.5 md:w-2 h-1.5 md:h-2 bg-[#00B8D4] rounded-full"></div>
             </div>
@@ -177,24 +177,24 @@ export default function ThreatAnalysis() {
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 md:gap-6">
             <div className="space-y-1">
-              <span className="font-label text-[10px] md:text-xs text-on-surface-variant">Domain Age</span>
-              <p className="font-medium text-sm md:text-base">2 Days</p>
+              <span className="font-label text-[10px] md:text-xs text-on-surface-variant">Antigüedad del Dominio</span>
+              <p className="font-medium text-sm md:text-base">2 Días</p>
             </div>
             <div className="space-y-1">
-              <span className="font-label text-[10px] md:text-xs text-on-surface-variant">Registrar</span>
-              <p className="font-medium text-sm md:text-base">Privacy Protected</p>
+              <span className="font-label text-[10px] md:text-xs text-on-surface-variant">Registrador</span>
+              <p className="font-medium text-sm md:text-base">Privacidad Protegida</p>
             </div>
             <div className="space-y-1">
-              <span className="font-label text-[10px] md:text-xs text-on-surface-variant">Server Location</span>
-              <p className="font-medium text-sm md:text-base">Vilnius, Lithuania</p>
+              <span className="font-label text-[10px] md:text-xs text-on-surface-variant">Ubicación del Servidor</span>
+              <p className="font-medium text-sm md:text-base">Vilna, Lituania</p>
             </div>
           </div>
           {isMalicious && (
             <div className="p-4 md:p-6 bg-error/5 rounded-xl flex items-start gap-3 md:gap-4">
               <Globe className="text-error w-5 h-5 md:w-6 md:h-6 shrink-0" />
               <div>
-                <p className="font-semibold text-sm md:text-base text-error">Impersonation Detected</p>
-                <p className="text-xs md:text-sm text-on-surface-variant">The URL mimics a legitimate financial institution login portal using homograph characters in the subdomain.</p>
+                <p className="font-semibold text-sm md:text-base text-error">Suplantación Detectada</p>
+                <p className="text-xs md:text-sm text-on-surface-variant">La URL imita un portal de inicio de sesión de una institución financiera legítima utilizando caracteres homógrafos en el subdominio.</p>
               </div>
             </div>
           )}
@@ -202,7 +202,7 @@ export default function ThreatAnalysis() {
 
         {/* Malware Breakdown */}
         <div className="col-span-12 lg:col-span-7 bg-white rounded-xl p-6 md:p-8">
-          <h3 className="font-headline text-lg md:text-xl font-bold mb-6 md:mb-8">Consensus Engine Results</h3>
+          <h3 className="font-headline text-lg md:text-xl font-bold mb-6 md:mb-8">Resultados del Motor de Consenso</h3>
           <div className="space-y-6 md:space-y-8">
             {scan.threatDetails?.malwareVectors.map((vector, idx) => (
               <div key={idx} className="flex gap-4 md:gap-6 items-start">
@@ -227,7 +227,7 @@ export default function ThreatAnalysis() {
         {/* Risk Factors Sidebar */}
         <div className="col-span-12 lg:col-span-5 flex flex-col gap-6">
           <div className="bg-surface-container-low rounded-xl p-6 md:p-8 h-full">
-            <h3 className="font-headline text-lg md:text-xl font-bold mb-6">Risk Factor Weights</h3>
+            <h3 className="font-headline text-lg md:text-xl font-bold mb-6">Pesos de los Factores de Riesgo</h3>
             <div className="space-y-5 md:space-y-6">
               {Object.entries(scan.threatDetails?.riskFactors || {}).map(([key, value]) => (
                 <div key={key} className="space-y-2">
@@ -250,7 +250,7 @@ export default function ThreatAnalysis() {
               ))}
             </div>
             <div className="mt-8 md:mt-10 p-4 md:p-6 bg-white rounded-xl shadow-sm space-y-4">
-              <h4 className="font-bold text-xs md:text-sm">Origin Map</h4>
+              <h4 className="font-bold text-xs md:text-sm">Mapa de Origen</h4>
               <div className="h-24 md:h-32 rounded-lg bg-surface-container-high relative overflow-hidden">
                 <img 
                   className="w-full h-full object-cover grayscale opacity-50" 
@@ -261,7 +261,7 @@ export default function ThreatAnalysis() {
                   <MapPin className="text-error w-6 h-6 md:w-8 md:h-8 fill-current" />
                 </div>
               </div>
-              <p className="text-[10px] md:text-xs text-on-surface-variant italic">Payload originates from non-standard routing node: AS12903</p>
+              <p className="text-[10px] md:text-xs text-on-surface-variant italic">La carga útil proviene de un nodo de enrutamiento no estándar: AS12903</p>
             </div>
           </div>
         </div>

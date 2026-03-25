@@ -64,45 +64,45 @@ export default function History() {
   return (
     <div className="max-w-7xl mx-auto w-full px-4 md:px-0">
       <header className="mb-8 md:mb-12">
-        <h1 className="font-headline text-3xl md:text-5xl font-bold text-on-surface mb-2 tracking-tighter">Scan History</h1>
-        <p className="text-on-surface-variant text-sm md:text-base max-w-2xl">Real-time surveillance logs of every QR interaction. Data is cryptographically verified to ensure environmental security.</p>
+        <h1 className="font-headline text-3xl md:text-5xl font-bold text-on-surface mb-2 tracking-tighter">Historial de Escaneos</h1>
+        <p className="text-on-surface-variant text-sm md:text-base max-w-2xl">Registros de vigilancia en tiempo real de cada interacción QR. Los datos se verifican criptográficamente para garantizar la seguridad ambiental.</p>
       </header>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-8 md:mb-12">
         <div className="bg-white p-6 md:p-8 rounded-xl flex flex-col justify-between border-l-4 border-[#006879] shadow-sm">
           <div>
-            <span className="text-[10px] md:text-xs font-medium text-[#006879] uppercase tracking-widest mb-2 md:mb-4 block">Total Scans</span>
+            <span className="text-[10px] md:text-xs font-medium text-[#006879] uppercase tracking-widest mb-2 md:mb-4 block">Escaneos Totales</span>
             <h2 className="font-headline text-3xl md:text-4xl font-bold text-on-surface">{stats.total.toLocaleString()}</h2>
           </div>
           <div className="flex items-center gap-2 mt-4 text-emerald-600">
-            <span className="text-[10px] md:text-xs font-bold font-headline">+12% vs last month</span>
+            <span className="text-[10px] md:text-xs font-bold font-headline">+12% vs el mes pasado</span>
           </div>
         </div>
         <div className="bg-white p-6 md:p-8 rounded-xl flex flex-col justify-between border-l-4 border-error shadow-sm">
           <div>
-            <span className="text-[10px] md:text-xs font-medium text-error uppercase tracking-widest mb-2 md:mb-4 block">Blocked Threats</span>
+            <span className="text-[10px] md:text-xs font-medium text-error uppercase tracking-widest mb-2 md:mb-4 block">Amenazas Bloqueadas</span>
             <h2 className="font-headline text-3xl md:text-4xl font-bold text-on-surface">{stats.blocked.toLocaleString()}</h2>
           </div>
           <div className="flex items-center gap-2 mt-4 text-error">
-            <span className="text-[10px] md:text-xs font-bold font-headline">Active Perimeter Shield</span>
+            <span className="text-[10px] md:text-xs font-bold font-headline">Escudo de Perímetro Activo</span>
           </div>
         </div>
         <div className="bg-white p-6 md:p-8 rounded-xl flex flex-col justify-between border-l-4 border-warning shadow-sm">
           <div>
-            <span className="text-[10px] md:text-xs font-medium text-warning uppercase tracking-widest mb-2 md:mb-4 block">Suspicious Scans</span>
+            <span className="text-[10px] md:text-xs font-medium text-warning uppercase tracking-widest mb-2 md:mb-4 block">Escaneos Sospechosos</span>
             <h2 className="font-headline text-3xl md:text-4xl font-bold text-on-surface">{stats.suspicious.toLocaleString()}</h2>
           </div>
           <div className="flex items-center gap-2 mt-4 text-warning">
-            <span className="text-[10px] md:text-xs font-bold font-headline">Heuristic Anomaly Detection</span>
+            <span className="text-[10px] md:text-xs font-bold font-headline">Detección de Anomalías Heurística</span>
           </div>
         </div>
         <div className="bg-white p-6 md:p-8 rounded-xl flex flex-col justify-between border-l-4 border-[#10B981] shadow-sm">
           <div>
-            <span className="text-[10px] md:text-xs font-medium text-[#10B981] uppercase tracking-widest mb-2 md:mb-4 block">Verified Safe</span>
+            <span className="text-[10px] md:text-xs font-medium text-[#10B981] uppercase tracking-widest mb-2 md:mb-4 block">Verificado Seguro</span>
             <h2 className="font-headline text-3xl md:text-4xl font-bold text-on-surface">{stats.safe.toLocaleString()}</h2>
           </div>
           <div className="flex items-center gap-2 mt-4 text-[#006879]">
-            <span className="text-[10px] md:text-xs font-bold font-headline">98.9% Success Rate</span>
+            <span className="text-[10px] md:text-xs font-bold font-headline">98.9% Tasa de Éxito</span>
           </div>
         </div>
       </div>
@@ -119,7 +119,7 @@ export default function History() {
             )}
           >
             <Filter className="w-3 h-3 md:w-4 md:h-4" />
-            All Status
+            Todos los Estados
           </button>
           <button 
             onClick={() => setSortBy("status")}
@@ -131,15 +131,15 @@ export default function History() {
             )}
           >
             <ShieldCheck className="w-3 h-3 md:w-4 md:h-4" />
-            Threat Level
+            Nivel de Amenaza
           </button>
           <button className="bg-white px-4 md:px-6 py-2 rounded-lg border border-outline-variant/20 flex items-center gap-2 text-[10px] md:text-sm font-semibold hover:bg-slate-50 transition-all">
             <Calendar className="w-3 h-3 md:w-4 md:h-4" />
-            Last 30 Days
+            Últimos 30 Días
           </button>
         </div>
         <span className="text-[10px] md:text-sm text-on-surface-variant font-medium uppercase tracking-wider">
-          SHOWING {paginatedScans.length} OF {stats.total} RECORDS (PAGE {currentPage} OF {totalPages || 1})
+          MOSTRANDO {paginatedScans.length} DE {stats.total} REGISTROS (PÁGINA {currentPage} DE {totalPages || 1})
         </span>
       </div>
 
@@ -148,16 +148,16 @@ export default function History() {
           <table className="w-full text-left border-collapse min-w-[800px]">
             <thead>
               <tr className="bg-surface-container-low">
-                <th className="px-6 md:px-8 py-4 md:py-5 text-[10px] md:text-xs font-bold text-on-surface-variant uppercase tracking-wider">URL / Source</th>
-                <th className="px-6 md:px-8 py-4 md:py-5 text-[10px] md:text-xs font-bold text-on-surface-variant uppercase tracking-wider">Security Status</th>
-                <th className="px-6 md:px-8 py-4 md:py-5 text-[10px] md:text-xs font-bold text-on-surface-variant uppercase tracking-wider">Timestamp</th>
-                <th className="px-6 md:px-8 py-4 md:py-5 text-[10px] md:text-xs font-bold text-on-surface-variant uppercase tracking-wider text-right">Actions</th>
+                <th className="px-6 md:px-8 py-4 md:py-5 text-[10px] md:text-xs font-bold text-on-surface-variant uppercase tracking-wider">URL / Origen</th>
+                <th className="px-6 md:px-8 py-4 md:py-5 text-[10px] md:text-xs font-bold text-on-surface-variant uppercase tracking-wider">Estado de Seguridad</th>
+                <th className="px-6 md:px-8 py-4 md:py-5 text-[10px] md:text-xs font-bold text-on-surface-variant uppercase tracking-wider">Marca de Tiempo</th>
+                <th className="px-6 md:px-8 py-4 md:py-5 text-[10px] md:text-xs font-bold text-on-surface-variant uppercase tracking-wider text-right">Acciones</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-surface-container-low">
               {loading ? (
                 <tr>
-                  <td colSpan={4} className="px-8 py-12 text-center text-on-surface-variant">Loading records...</td>
+                  <td colSpan={4} className="px-8 py-12 text-center text-on-surface-variant">Cargando registros...</td>
                 </tr>
               ) : paginatedScans.length > 0 ? (
                 paginatedScans.map((scan) => (
@@ -196,7 +196,7 @@ export default function History() {
                 ))
               ) : (
                 <tr>
-                  <td colSpan={4} className="px-8 py-12 text-center text-on-surface-variant">No scan history found.</td>
+                  <td colSpan={4} className="px-8 py-12 text-center text-on-surface-variant">No se encontró historial de escaneos.</td>
                 </tr>
               )}
             </tbody>
@@ -205,7 +205,7 @@ export default function History() {
         
         <div className="px-6 md:px-8 py-4 md:py-6 bg-surface-container-low/30 border-t border-surface-container-low flex justify-between items-center">
           <span className="text-xs md:text-sm text-on-surface-variant">
-            Showing {sortedScans.length > 0 ? ((currentPage - 1) * pageSize) + 1 : 0} to {Math.min(currentPage * pageSize, sortedScans.length)} of {sortedScans.length} results
+            Mostrando {sortedScans.length > 0 ? ((currentPage - 1) * pageSize) + 1 : 0} a {Math.min(currentPage * pageSize, sortedScans.length)} de {sortedScans.length} resultados
           </span>
           <div className="flex gap-2">
             <button 

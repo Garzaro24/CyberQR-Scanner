@@ -52,7 +52,7 @@ export default function Scanner() {
     scanner.render(onScanSuccess, (error) => {
       // Handle camera permission errors or other initialization errors
       if (typeof error === 'string' && (error.includes("NotAllowedError") || error.includes("Permission denied"))) {
-        setCameraError("Camera access denied. Please enable camera permissions in your browser settings.");
+        setCameraError("Acceso a la cámara denegado. Por favor, habilita los permisos de la cámara en la configuración de tu navegador.");
       }
       onScanFailure(error);
     });
@@ -79,7 +79,7 @@ export default function Scanner() {
         body: JSON.stringify({ url: decodedText })
       });
 
-      if (!response.ok) throw new Error("Failed to scan URL via VirusTotal");
+      if (!response.ok) throw new Error("Error al escanear la URL a través de VirusTotal");
 
       const vtData = await response.json();
       const status = vtData.status;
@@ -134,7 +134,7 @@ export default function Scanner() {
       handleFirestoreError(error, OperationType.CREATE, "scans");
       setScanning(false);
       isScanningRef.current = false;
-      alert("VirusTotal scan failed. Using heuristic fallback.");
+      alert("El escaneo de VirusTotal falló. Usando respaldo heurístico.");
     }
   }
 
@@ -214,16 +214,16 @@ export default function Scanner() {
     <div className="max-w-6xl mx-auto px-4 md:px-0">
       <div className="flex flex-col lg:flex-row lg:items-end justify-between mb-8 md:mb-12 gap-6">
         <div className="max-w-xl">
-          <h1 className="text-3xl md:text-4xl font-bold font-headline tracking-tight text-on-surface mb-2">Secure QR Intake</h1>
-          <p className="text-on-surface-variant text-base md:text-lg leading-relaxed">Position any code within the high-precision viewfinder. Our AI-driven engine validates authenticity and security protocols in real-time.</p>
+          <h1 className="text-3xl md:text-4xl font-bold font-headline tracking-tight text-on-surface mb-2">Captura Segura de QR</h1>
+          <p className="text-on-surface-variant text-base md:text-lg leading-relaxed">Coloca cualquier código dentro del visor de alta precisión. Nuestro motor impulsado por IA valida la autenticidad y los protocolos de seguridad en tiempo real.</p>
         </div>
         <div className="flex items-center gap-4 bg-white p-2 rounded-xl shadow-sm self-start lg:self-auto">
           <div className="px-4 py-2 border-r border-outline-variant/20">
-            <span className="block text-[10px] font-bold text-outline uppercase">Latency</span>
+            <span className="block text-[10px] font-bold text-outline uppercase">Latencia</span>
             <span className="text-base md:text-lg font-headline font-bold text-[#006879]">12ms</span>
           </div>
           <div className="px-4 py-2">
-            <span className="block text-[10px] font-bold text-outline uppercase">Engine</span>
+            <span className="block text-[10px] font-bold text-outline uppercase">Motor</span>
             <span className="text-base md:text-lg font-headline font-bold text-[#006879]">v4.2-Pro</span>
           </div>
         </div>
@@ -249,13 +249,13 @@ export default function Scanner() {
             {cameraError && (
               <div className="absolute inset-0 bg-slate-900 flex flex-col items-center justify-center p-8 text-center z-30">
                 <CameraOff className="w-16 h-16 text-error mb-4" />
-                <h3 className="text-white font-headline text-xl font-bold mb-2">Camera Access Required</h3>
+                <h3 className="text-white font-headline text-xl font-bold mb-2">Acceso a la Cámara Requerido</h3>
                 <p className="text-slate-400 text-sm max-w-xs">{cameraError}</p>
                 <button 
                   onClick={() => window.location.reload()}
                   className="mt-6 px-6 py-2 bg-primary text-white rounded-lg font-bold text-xs uppercase tracking-widest"
                 >
-                  Retry Connection
+                  Reintentar Conexión
                 </button>
               </div>
             )}
@@ -264,14 +264,14 @@ export default function Scanner() {
             {scanning && (
               <div className="absolute inset-0 bg-black/40 backdrop-blur-sm flex flex-col items-center justify-center z-10">
                 <div className="w-16 h-16 border-4 border-[#00B8D4] border-t-transparent rounded-full animate-spin mb-4"></div>
-                <span className="text-white font-headline font-bold tracking-widest uppercase">Analyzing Threat Vector...</span>
+                <span className="text-white font-headline font-bold tracking-widest uppercase">Analizando Vector de Amenaza...</span>
               </div>
             )}
 
             {scanComplete && (
               <div className="absolute inset-0 bg-emerald-500/80 backdrop-blur-md flex flex-col items-center justify-center z-10">
                 <CheckCircle2 className="w-20 h-20 text-white mb-4 animate-bounce" />
-                <span className="text-white font-headline text-2xl font-bold tracking-widest uppercase">Scan Verified</span>
+                <span className="text-white font-headline text-2xl font-bold tracking-widest uppercase">Escaneo Verificado</span>
               </div>
             )}
             
@@ -280,7 +280,7 @@ export default function Scanner() {
                 <div className="flex items-center gap-2">
                   <div className={cn("w-2 h-2 rounded-full", scanning ? "bg-warning animate-pulse" : "bg-emerald-500")}></div>
                   <span className="text-[10px] md:text-xs font-bold tracking-widest uppercase font-label text-slate-900">
-                    {scanning ? "AI Analysis in Progress" : "Live Feed Active"}
+                    {scanning ? "Análisis de IA en Progreso" : "Transmisión en Vivo Activa"}
                   </span>
                 </div>
               </div>
@@ -290,35 +290,35 @@ export default function Scanner() {
           <div className="mt-4 flex items-center gap-3 p-4 bg-surface-container-low rounded-xl border border-outline-variant/10">
             <Info className="w-5 h-5 text-[#006879]" />
             <p className="text-xs text-on-surface-variant">
-              The camera feed is processed locally. No biometric data is transmitted. Only the decoded URL is analyzed for threats.
+              La transmisión de la cámara se procesa localmente. No se transmiten datos biométricos. Solo se analiza la URL decodificada en busca de amenazas.
             </p>
           </div>
         </div>
 
         <div className="lg:col-span-4 flex flex-col gap-6">
           <div className="bg-white p-6 rounded-2xl shadow-sm flex flex-col gap-6">
-            <h3 className="font-headline font-bold text-lg text-on-surface">Security Profile</h3>
+            <h3 className="font-headline font-bold text-lg text-on-surface">Perfil de Seguridad</h3>
             <div className="space-y-4">
               <div className="flex items-center justify-between p-4 bg-surface-container-low rounded-xl">
                 <div className="flex items-center gap-3">
                   <CheckCircle2 className="text-emerald-500 w-5 h-5" />
-                  <span className="text-sm font-medium">Encryption Check</span>
+                  <span className="text-sm font-medium">Verificación de Cifrado</span>
                 </div>
-                <span className="text-xs font-bold font-label text-emerald-500">SECURE</span>
+                <span className="text-xs font-bold font-label text-emerald-500">SEGURO</span>
               </div>
               <div className="flex items-center justify-between p-4 bg-surface-container-low rounded-xl">
                 <div className="flex items-center gap-3">
                   <AlertTriangle className="text-warning w-5 h-5" />
-                  <span className="text-sm font-medium">Domain Verification</span>
+                  <span className="text-sm font-medium">Verificación de Dominio</span>
                 </div>
-                <span className="text-xs font-bold font-label text-warning">PENDING</span>
+                <span className="text-xs font-bold font-label text-warning">PENDIENTE</span>
               </div>
               <div className="flex items-center justify-between p-4 bg-surface-container-low rounded-xl">
                 <div className="flex items-center gap-3">
                   <Info className="text-[#006879] w-5 h-5" />
-                  <span className="text-sm font-medium">Metadata Analysis</span>
+                  <span className="text-sm font-medium">Análisis de Metadatos</span>
                 </div>
-                <span className="text-xs font-bold font-label text-[#006879]">STANDBY</span>
+                <span className="text-xs font-bold font-label text-[#006879]">EN ESPERA</span>
               </div>
             </div>
             <div className="pt-4 border-t border-outline-variant/10">
@@ -334,15 +334,15 @@ export default function Scanner() {
                 className="w-full py-4 border-2 border-outline-variant/20 rounded-xl text-outline font-headline font-bold hover:bg-surface-container-low hover:text-[#006879] transition-all flex items-center justify-center gap-2"
               >
                 <Upload className="w-5 h-5" />
-                UPLOAD FILE INSTEAD
+                SUBIR ARCHIVO EN SU LUGAR
               </button>
             </div>
           </div>
 
           <div className="bg-[#006879] p-6 rounded-2xl text-white relative overflow-hidden group">
             <div className="relative z-10">
-              <h4 className="font-headline font-bold text-lg mb-2">Pro Tip: Dark Mode Codes</h4>
-              <p className="text-sm text-[#a8edff] leading-relaxed">Inverted QR codes are automatically detected and normalized by our scanner. No manual adjustment required.</p>
+              <h4 className="font-headline font-bold text-lg mb-2">Consejo Pro: Códigos en Modo Oscuro</h4>
+              <p className="text-sm text-[#a8edff] leading-relaxed">Los códigos QR invertidos se detectan y normalizan automáticamente por nuestro escáner. No se requiere ajuste manual.</p>
             </div>
             <div className="absolute -right-4 -bottom-4 opacity-10 transform group-hover:scale-110 transition-transform">
               <Zap className="w-24 h-24" />

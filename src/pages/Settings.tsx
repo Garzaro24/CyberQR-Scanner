@@ -39,20 +39,20 @@ export default function Settings() {
       // Update Password if provided
       if (newPassword) {
         if (newPassword !== confirmPassword) {
-          throw new Error("Passwords do not match");
+          throw new Error("Las contraseñas no coinciden");
         }
         if (!isPasswordSecure) {
-          throw new Error("New password does not meet security requirements (6-10 chars, 1 number, 1 special char)");
+          throw new Error("La nueva contraseña no cumple con los requisitos de seguridad (6-10 caracteres, 1 número, 1 carácter especial)");
         }
         await updatePassword(user, newPassword);
       }
 
-      setSuccess("Profile updated successfully");
+      setSuccess("Perfil actualizado con éxito");
       setIsEditing(false);
       setNewPassword("");
       setConfirmPassword("");
     } catch (err: any) {
-      setError(err.message || "Failed to update profile");
+      setError(err.message || "Error al actualizar el perfil");
     } finally {
       setLoading(false);
     }
@@ -61,8 +61,8 @@ export default function Settings() {
   return (
     <div className="max-w-4xl mx-auto w-full px-4 md:px-0">
       <header className="mb-8 md:mb-12">
-        <h1 className="font-headline text-3xl md:text-5xl font-bold text-on-surface mb-2 tracking-tighter">System Configuration</h1>
-        <p className="text-on-surface-variant text-sm md:text-base">Manage your operator profile and security clearance parameters.</p>
+        <h1 className="font-headline text-3xl md:text-5xl font-bold text-on-surface mb-2 tracking-tighter">Configuración del Sistema</h1>
+        <p className="text-on-surface-variant text-sm md:text-base">Gestione su perfil de operador y los parámetros de autorización de seguridad.</p>
       </header>
 
       {error && (
@@ -97,14 +97,14 @@ export default function Settings() {
               )}
             </div>
             <div className="flex-grow">
-              <h2 className="font-headline text-xl md:text-2xl font-bold text-on-surface">{user?.displayName || "Operator"}</h2>
+              <h2 className="font-headline text-xl md:text-2xl font-bold text-on-surface">{user?.displayName || "Operador"}</h2>
               <p className="text-on-surface-variant text-sm md:text-base flex items-center gap-2 mt-1">
                 <Mail className="w-4 h-4" />
                 {user?.email}
               </p>
               <div className="flex items-center gap-2 mt-2">
-                <span className="px-2 py-0.5 bg-primary/10 text-primary text-[10px] md:text-xs font-bold rounded uppercase tracking-widest">Clearance Level 4</span>
-                <span className="px-2 py-0.5 bg-emerald-500/10 text-emerald-500 text-[10px] md:text-xs font-bold rounded uppercase tracking-widest">Active Status</span>
+                <span className="px-2 py-0.5 bg-primary/10 text-primary text-[10px] md:text-xs font-bold rounded uppercase tracking-widest">Nivel de Autorización 4</span>
+                <span className="px-2 py-0.5 bg-emerald-500/10 text-emerald-500 text-[10px] md:text-xs font-bold rounded uppercase tracking-widest">Estado Activo</span>
               </div>
             </div>
             {!isEditing && (
@@ -112,7 +112,7 @@ export default function Settings() {
                 onClick={() => setIsEditing(true)}
                 className="w-full md:w-auto px-6 py-2 bg-surface-container-low text-on-surface font-semibold rounded-lg hover:bg-surface-container-high transition-colors text-sm"
               >
-                Edit Profile
+                Editar Perfil
               </button>
             )}
           </div>
@@ -121,30 +121,30 @@ export default function Settings() {
             <form onSubmit={handleUpdateProfile} className="space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-2">
-                  <label className="block text-[10px] md:text-xs font-bold text-on-surface-variant uppercase tracking-wider">Display Name</label>
+                  <label className="block text-[10px] md:text-xs font-bold text-on-surface-variant uppercase tracking-wider">Nombre de Usuario</label>
                   <input 
                     type="text" 
                     value={displayName}
                     onChange={(e) => setDisplayName(e.target.value)}
                     className="w-full px-4 py-2.5 bg-surface-container-low border border-outline-variant/20 rounded-lg text-sm font-medium text-on-surface focus:ring-2 focus:ring-primary/20 outline-none"
-                    placeholder="Enter display name"
+                    placeholder="Ingrese nombre de usuario"
                   />
                 </div>
                 <div className="space-y-2">
-                  <label className="block text-[10px] md:text-xs font-bold text-on-surface-variant uppercase tracking-wider">Email Address</label>
+                  <label className="block text-[10px] md:text-xs font-bold text-on-surface-variant uppercase tracking-wider">Correo Electrónico</label>
                   <div className="w-full px-4 py-2.5 bg-surface-container-low border border-outline-variant/20 rounded-lg text-sm font-medium text-on-surface opacity-60">
                     {user?.email}
                   </div>
                 </div>
                 <div className="space-y-2">
-                  <label className="block text-[10px] md:text-xs font-bold text-on-surface-variant uppercase tracking-wider">New Password</label>
+                  <label className="block text-[10px] md:text-xs font-bold text-on-surface-variant uppercase tracking-wider">Nueva Contraseña</label>
                   <div className="relative">
                     <input 
                       type={showPassword ? "text" : "password"} 
                       value={newPassword}
                       onChange={(e) => setNewPassword(e.target.value)}
                       className="w-full px-4 py-2.5 bg-surface-container-low border border-outline-variant/20 rounded-lg text-sm font-medium text-on-surface focus:ring-2 focus:ring-primary/20 outline-none pr-10"
-                      placeholder="Leave blank to keep current"
+                      placeholder="Dejar en blanco para mantener la actual"
                       maxLength={10}
                     />
                     <button
@@ -173,28 +173,28 @@ export default function Settings() {
                       <div className="grid grid-cols-1 gap-1.5">
                         <div className={`flex items-center gap-2 text-[10px] font-medium transition-colors ${passwordRequirements.length ? 'text-emerald-500' : 'text-outline'}`}>
                           {passwordRequirements.length ? <CheckCircle2 className="w-3 h-3" /> : <AlertCircle className="w-3 h-3" />}
-                          Between 6 and 10 characters
+                          Entre 6 y 10 caracteres
                         </div>
                         <div className={`flex items-center gap-2 text-[10px] font-medium transition-colors ${passwordRequirements.number ? 'text-emerald-500' : 'text-outline'}`}>
                           {passwordRequirements.number ? <CheckCircle2 className="w-3 h-3" /> : <AlertCircle className="w-3 h-3" />}
-                          At least 1 number
+                          Al menos 1 número
                         </div>
                         <div className={`flex items-center gap-2 text-[10px] font-medium transition-colors ${passwordRequirements.special ? 'text-emerald-500' : 'text-outline'}`}>
                           {passwordRequirements.special ? <CheckCircle2 className="w-3 h-3" /> : <AlertCircle className="w-3 h-3" />}
-                          At least 1 special character
+                          Al menos 1 carácter especial
                         </div>
                       </div>
                     </div>
                   )}
                 </div>
                 <div className="space-y-2">
-                  <label className="block text-[10px] md:text-xs font-bold text-on-surface-variant uppercase tracking-wider">Confirm Password</label>
+                  <label className="block text-[10px] md:text-xs font-bold text-on-surface-variant uppercase tracking-wider">Confirmar Contraseña</label>
                   <input 
                     type="password" 
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
                     className="w-full px-4 py-2.5 bg-surface-container-low border border-outline-variant/20 rounded-lg text-sm font-medium text-on-surface focus:ring-2 focus:ring-primary/20 outline-none"
-                    placeholder="Confirm new password"
+                    placeholder="Confirmar nueva contraseña"
                     maxLength={10}
                   />
                 </div>
@@ -206,7 +206,7 @@ export default function Settings() {
                   className="flex-1 bg-primary text-white font-bold py-2.5 rounded-lg hover:bg-primary/90 transition-colors flex items-center justify-center gap-2 disabled:opacity-50"
                 >
                   {loading && <Loader2 className="w-4 h-4 animate-spin" />}
-                  Save Changes
+                  Guardar Cambios
                 </button>
                 <button 
                   type="button"
@@ -219,20 +219,20 @@ export default function Settings() {
                   }}
                   className="flex-1 bg-surface-container-low text-on-surface font-bold py-2.5 rounded-lg hover:bg-surface-container-high transition-colors"
                 >
-                  Cancel
+                  Cancelar
                 </button>
               </div>
             </form>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-2">
-                <label className="block text-[10px] md:text-xs font-bold text-on-surface-variant uppercase tracking-wider">Display Name</label>
+                <label className="block text-[10px] md:text-xs font-bold text-on-surface-variant uppercase tracking-wider">Nombre de Usuario</label>
                 <div className="w-full px-4 py-2.5 bg-surface-container-low border border-outline-variant/20 rounded-lg text-sm font-medium text-on-surface">
                   {user?.displayName || "N/A"}
                 </div>
               </div>
               <div className="space-y-2">
-                <label className="block text-[10px] md:text-xs font-bold text-on-surface-variant uppercase tracking-wider">Email Address</label>
+                <label className="block text-[10px] md:text-xs font-bold text-on-surface-variant uppercase tracking-wider">Correo Electrónico</label>
                 <div className="w-full px-4 py-2.5 bg-surface-container-low border border-outline-variant/20 rounded-lg text-sm font-medium text-on-surface opacity-60">
                   {user?.email || "N/A"}
                 </div>

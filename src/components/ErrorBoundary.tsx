@@ -25,11 +25,11 @@ export class ErrorBoundary extends Component<Props, State> {
 
   public render() {
     if (this.state.hasError) {
-      let errorMessage = "An unexpected error occurred.";
+      let errorMessage = "Ocurrió un error inesperado.";
       try {
         const parsedError = JSON.parse(this.state.error?.message || "");
         if (parsedError.error) {
-          errorMessage = `Firestore Error: ${parsedError.error} during ${parsedError.operationType} at ${parsedError.path}`;
+          errorMessage = `Error de Firestore: ${parsedError.error} durante ${parsedError.operationType} en ${parsedError.path}`;
         }
       } catch (e) {
         errorMessage = this.state.error?.message || errorMessage;
@@ -38,13 +38,13 @@ export class ErrorBoundary extends Component<Props, State> {
       return (
         <div className="min-h-screen flex items-center justify-center bg-background p-4">
           <div className="bg-surface-container-lowest p-8 rounded-xl shadow-lg max-w-md w-full border-l-4 border-error">
-            <h2 className="text-2xl font-headline font-bold text-on-surface mb-4">Something went wrong</h2>
+            <h2 className="text-2xl font-headline font-bold text-on-surface mb-4">Algo salió mal</h2>
             <p className="text-on-surface-variant mb-6">{errorMessage}</p>
             <button
               onClick={() => window.location.reload()}
               className="w-full py-3 bg-primary text-white font-bold rounded-md hover:bg-primary/90 transition-all"
             >
-              Reload Application
+              Recargar Aplicación
             </button>
           </div>
         </div>

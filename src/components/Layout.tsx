@@ -42,13 +42,13 @@ export default function Layout() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const navItems = [
-    { name: "Scanner", path: "/", icon: QrCode },
-    { name: "History", path: "/history", icon: History },
-    { name: "Settings", path: "/settings", icon: Settings },
+    { name: "Escáner", path: "/", icon: QrCode },
+    { name: "Historial", path: "/history", icon: History },
+    { name: "Ajustes", path: "/settings", icon: Settings },
   ];
 
   const scannerTools = [
-    { name: "Live Scanner", path: "/", icon: QrCode, active: location.pathname === "/" || location.pathname === "/scanner" },
+    { name: "Escáner en Vivo", path: "/", icon: QrCode, active: location.pathname === "/" || location.pathname === "/scanner" },
   ];
 
   return (
@@ -99,7 +99,7 @@ export default function Layout() {
                 className="w-full flex items-center gap-2 p-4 text-sm text-error hover:bg-slate-50 transition-colors"
               >
                 <LogOut className="w-4 h-4" />
-                Sign Out
+                Cerrar Sesión
               </button>
             </div>
           </div>
@@ -136,7 +136,7 @@ export default function Layout() {
               ))}
             </nav>
             <div className="mt-8 pt-8 border-t border-outline-variant/10">
-              <div className="px-4 py-2 text-xs font-bold text-outline uppercase tracking-widest mb-2">Scanner Tools</div>
+              <div className="px-4 py-2 text-xs font-bold text-outline uppercase tracking-widest mb-2">Herramientas de Escaneo</div>
               {scannerTools.map((tool) => (
                 <Link
                   key={tool.name}
@@ -162,7 +162,7 @@ export default function Layout() {
         {/* Sidebar Navigation (Desktop) */}
         <aside className="w-64 bg-surface-container-low hidden md:flex flex-col p-6 fixed h-[calc(100vh-80px)]">
           <div className="space-y-1">
-            <div className="px-3 py-2 text-xs font-bold text-outline uppercase tracking-widest mb-2 font-label">Scanner Tools</div>
+            <div className="px-3 py-2 text-xs font-bold text-outline uppercase tracking-widest mb-2 font-label">Herramientas de Escaneo</div>
             {scannerTools.map((tool) => (
               <Link
                 key={tool.name}

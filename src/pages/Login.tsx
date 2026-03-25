@@ -70,7 +70,7 @@ export default function Login() {
       navigate(from, { replace: true });
     } catch (err: any) {
       console.error("Login error:", err);
-      setError(err.message || "An error occurred during sign in.");
+      setError(err.message || "Ocurrió un error durante el inicio de sesión.");
     } finally {
       setLoading(false);
     }
@@ -85,7 +85,7 @@ export default function Login() {
     const cleanEmail = sanitizeInput(email);
 
     if (!validateEmail(cleanEmail)) {
-      setError("Please enter a valid email address.");
+      setError("Por favor, introduce una dirección de correo electrónico válida.");
       setLoading(false);
       return;
     }
@@ -97,13 +97,13 @@ export default function Login() {
         handleCodeInApp: true,
       };
       await sendPasswordResetEmail(auth, cleanEmail, actionCodeSettings);
-      setSuccess("Password reset email sent! Please check your inbox.");
+      setSuccess("¡Correo de restablecimiento de contraseña enviado! Por favor, revisa tu bandeja de entrada.");
     } catch (err: any) {
       console.error("Reset error:", err);
       if (err.code === 'auth/user-not-found') {
-        setError("No account found with this email address.");
+        setError("No se encontró ninguna cuenta con esta dirección de correo electrónico.");
       } else {
-        setError(err.message || "An error occurred while sending the reset email.");
+        setError(err.message || "Ocurrió un error al enviar el correo de restablecimiento.");
       }
     } finally {
       setLoading(false);
@@ -121,25 +121,25 @@ export default function Login() {
     const cleanName = sanitizeInput(displayName);
 
     if (!validateEmail(cleanEmail)) {
-      setError("Please enter a valid email address.");
+      setError("Por favor, introduce una dirección de correo electrónico válida.");
       setLoading(false);
       return;
     }
 
     if (isSignUp && !isPasswordSecure) {
-      setError("Please meet all password security requirements.");
+      setError("Por favor, cumple con todos los requisitos de seguridad de la contraseña.");
       setLoading(false);
       return;
     }
 
     if (!isSignUp && (cleanPassword.length < 6 || cleanPassword.length > 10)) {
-      setError("Password must be between 6 and 10 characters long.");
+      setError("La contraseña debe tener entre 6 y 10 caracteres.");
       setLoading(false);
       return;
     }
 
     if (isSignUp && password !== confirmPassword) {
-      setError("Passwords do not match.");
+      setError("Las contraseñas no coinciden.");
       setLoading(false);
       return;
     }
@@ -168,14 +168,14 @@ export default function Login() {
             createdAt: serverTimestamp(),
           });
 
-          setSuccess("Account created! Please check your email for a verification link before logging in.");
+          setSuccess("¡Cuenta creada! Por favor, revisa tu correo para ver el enlace de verificación antes de iniciar sesión.");
           setIsSignUp(false);
           setEmail("");
           setPassword("");
           setDisplayName("");
         } catch (err: any) {
           if (err.code === 'auth/email-already-in-use') {
-            setError("Error: This account already exists. Please sign in instead.");
+            setError("Error: Esta cuenta ya existe. Por favor, inicia sesión en su lugar.");
           } else {
             throw err;
           }
@@ -186,7 +186,7 @@ export default function Login() {
         const user = result.user;
 
         if (!user.emailVerified) {
-          setError("Please verify your email address before signing in. Check your inbox for the link.");
+          setError("Por favor, verifica tu dirección de correo electrónico antes de iniciar sesión. Revisa tu bandeja de entrada para ver el enlace.");
           // Optionally resend verification: await sendEmailVerification(user);
           return;
         }
@@ -196,11 +196,11 @@ export default function Login() {
     } catch (err: any) {
       console.error("Auth error:", err);
       if (err.code === 'auth/user-not-found' || err.code === 'auth/wrong-password' || err.code === 'auth/invalid-credential') {
-        setError("Invalid email or password. Please check your credentials.");
+        setError("Correo electrónico o contraseña no válidos. Por favor, comprueba tus credenciales.");
       } else if (err.code === 'auth/operation-not-allowed') {
-        setError("Email/Password authentication is not enabled in the Firebase Console. Please enable it in the Authentication > Sign-in method tab.");
+        setError("La autenticación por correo/contraseña no está habilitada en la consola de Firebase. Por favor, habilítala en la pestaña Autenticación > Método de inicio de sesión.");
       } else {
-        setError(err.message || "An error occurred during authentication.");
+        setError(err.message || "Ocurrió un error durante la autenticación.");
       }
     } finally {
       setLoading(false);
@@ -224,9 +224,9 @@ export default function Login() {
                 <ShieldCheck className="text-white w-8 h-8" />
                 <span className="font-headline font-bold text-2xl text-white tracking-tight">CyberQR</span>
               </div>
-              <h2 className="font-headline text-4xl font-bold text-white leading-tight mb-6">Securing the digital frontier.</h2>
+              <h2 className="font-headline text-4xl font-bold text-white leading-tight mb-6">Asegurando la frontera digital.</h2>
               <p className="text-white/80 font-body text-lg max-w-xs leading-relaxed">
-                Enterprise-grade QR authentication and threat detection monitoring for modern security protocols.
+                Autenticación QR de grado empresarial y monitoreo de detección de amenazas para protocolos de seguridad modernos.
               </p>
             </div>
 
@@ -236,8 +236,8 @@ export default function Login() {
                   <div className="w-1.5 h-1.5 bg-[#00B8D4] rounded-full"></div>
                 </div>
                 <div className="flex flex-col">
-                  <span className="text-white font-headline text-sm font-semibold">Global Sentry Active</span>
-                  <span className="text-white/60 font-label text-[10px] uppercase tracking-widest">Real-time threat monitoring</span>
+                  <span className="text-white font-headline text-sm font-semibold">Centinela Global Activo</span>
+                  <span className="text-white/60 font-label text-[10px] uppercase tracking-widest">Monitoreo de amenazas en tiempo real</span>
                 </div>
               </div>
             </div>
@@ -258,12 +258,12 @@ export default function Login() {
             <div className="max-w-md mx-auto w-full">
               <header className="mb-10">
                 <h1 className="font-headline text-3xl font-bold text-on-surface mb-2 tracking-tight">
-                  {isForgotPassword ? "Reset Password" : (isSignUp ? "Create Account" : "Secure Access")}
+                  {isForgotPassword ? "Restablecer Contraseña" : (isSignUp ? "Crear Cuenta" : "Acceso Seguro")}
                 </h1>
                 <p className="text-on-surface-variant font-body">
                   {isForgotPassword 
-                    ? "Enter your email to receive a password reset link." 
-                    : (isSignUp ? "Register your enterprise credentials." : "Enter your credentials to access the CyberQR dashboard.")}
+                    ? "Introduce tu correo para recibir un enlace de restablecimiento de contraseña." 
+                    : (isSignUp ? "Registra tus credenciales empresariales." : "Introduce tus credenciales para acceder al panel de CyberQR.")}
                 </p>
               </header>
 
@@ -279,7 +279,7 @@ export default function Login() {
                       className="w-5 h-5 grayscale group-hover:grayscale-0 transition-all" 
                       src="https://lh3.googleusercontent.com/aida-public/AB6AXuApIXzlPNIueclwJkHhGVbFBCKGv5H4hl6fpMOSQU-qRy7jROwnmfcofktbA-m-A5b_WvbNVBmR8p9BR0ErtDxWqDBSvYaF6qdVeOXYRx3_x0kHNDhvwK9d4jRg8khL6Yw19fgpRe5pJFgJG3Nl32MrdPHYnGR64pxxinZ4AXGLCNJAo6T5rYUQVIF7RD0FMcWX89QtOUAP-rQ1xWcdcmLHcKiXSgkhaOwxJweSnoHRj5jX3cnH-mxETwdWlW36v0HisHd8EXXzFyw"
                     />
-                    <span className="font-label font-medium text-on-surface-variant">Continue with Google</span>
+                    <span className="font-label font-medium text-on-surface-variant">Continuar con Google</span>
                   </button>
                 </div>
               )}
@@ -287,7 +287,7 @@ export default function Login() {
               {!isForgotPassword && (
                 <div className="relative flex items-center mb-8">
                   <div className="flex-grow border-t border-outline-variant/20"></div>
-                  <span className="flex-shrink mx-4 text-outline font-label text-[10px] uppercase tracking-widest">or use email</span>
+                  <span className="flex-shrink mx-4 text-outline font-label text-[10px] uppercase tracking-widest">o usa tu correo</span>
                   <div className="flex-grow border-t border-outline-variant/20"></div>
                 </div>
               )}
@@ -295,7 +295,7 @@ export default function Login() {
               <form onSubmit={isForgotPassword ? handleForgotPassword : handleEmailAuth} className="space-y-6">
                 {isSignUp && !isForgotPassword && (
                   <div className="group">
-                    <label className="block font-label text-[11px] uppercase tracking-wider text-outline mb-2 ml-1" htmlFor="name">Full Name</label>
+                    <label className="block font-label text-[11px] uppercase tracking-wider text-outline mb-2 ml-1" htmlFor="name">Nombre Completo</label>
                     <div className="relative">
                       <User className="absolute left-4 top-1/2 -translate-y-1/2 text-outline w-5 h-5" />
                       <input 
@@ -312,7 +312,7 @@ export default function Login() {
                   </div>
                 )}
                 <div className="group">
-                  <label className="block font-label text-[11px] uppercase tracking-wider text-outline mb-2 ml-1" htmlFor="email">Work Email</label>
+                  <label className="block font-label text-[11px] uppercase tracking-wider text-outline mb-2 ml-1" htmlFor="email">Correo de Trabajo</label>
                   <div className="relative">
                     <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-outline w-5 h-5" />
                     <input 
@@ -331,7 +331,7 @@ export default function Login() {
                 {!isForgotPassword && (
                   <div className="group">
                     <div className="flex justify-between items-center mb-2 ml-1">
-                      <label className="block font-label text-[11px] uppercase tracking-wider text-outline" htmlFor="password">Password</label>
+                      <label className="block font-label text-[11px] uppercase tracking-wider text-outline" htmlFor="password">Contraseña</label>
                       {!isSignUp && (
                         <button 
                           type="button"
@@ -342,7 +342,7 @@ export default function Login() {
                           }}
                           className="font-label text-[11px] text-[#006879] hover:underline transition-all"
                         >
-                          Forgot?
+                          ¿Olvidaste?
                         </button>
                       )}
                     </div>
@@ -378,7 +378,7 @@ export default function Login() {
                           value={confirmPassword}
                           onChange={(e) => setConfirmPassword(e.target.value)}
                           className="w-full pl-12 pr-4 py-4 bg-surface-container-low border-b-2 border-outline-variant/10 focus:border-primary outline-none font-body text-on-surface transition-all peer"
-                          placeholder="Confirm Password"
+                          placeholder="Confirmar Contraseña"
                           required
                           maxLength={10}
                         />
@@ -388,19 +388,19 @@ export default function Login() {
 
                     {isSignUp && (
                       <div className="mt-3 space-y-2 p-3 bg-surface-container-low rounded-md border border-outline-variant/10">
-                        <p className="text-[10px] font-label uppercase tracking-widest text-outline mb-2">Security Requirements</p>
+                        <p className="text-[10px] font-label uppercase tracking-widest text-outline mb-2">Requisitos de Seguridad</p>
                         <div className="grid grid-cols-1 gap-1.5">
                           <div className={`flex items-center gap-2 text-xs ${passwordRequirements.length ? 'text-emerald-600' : 'text-outline'}`}>
                             {passwordRequirements.length ? <Check className="w-3 h-3" /> : <X className="w-3 h-3" />}
-                            <span>Between 6 and 10 characters</span>
+                            <span>Entre 6 y 10 caracteres</span>
                           </div>
                           <div className={`flex items-center gap-2 text-xs ${passwordRequirements.number ? 'text-emerald-600' : 'text-outline'}`}>
                             {passwordRequirements.number ? <Check className="w-3 h-3" /> : <X className="w-3 h-3" />}
-                            <span>At least 1 number</span>
+                            <span>Al menos 1 número</span>
                           </div>
                           <div className={`flex items-center gap-2 text-xs ${passwordRequirements.special ? 'text-emerald-600' : 'text-outline'}`}>
                             {passwordRequirements.special ? <Check className="w-3 h-3" /> : <X className="w-3 h-3" />}
-                            <span>At least 1 special character</span>
+                            <span>Al menos 1 carácter especial</span>
                           </div>
                         </div>
                         
@@ -438,7 +438,7 @@ export default function Login() {
                     disabled={loading}
                     className="w-full py-4 bg-[#00B8D4] text-white font-headline font-bold rounded-md shadow-lg shadow-[#00B8D4]/20 hover:scale-[1.01] active:scale-[0.99] transition-all flex items-center justify-center gap-2 group disabled:opacity-50"
                   >
-                    {loading ? "Processing..." : (isForgotPassword ? "Send Reset Link" : (isSignUp ? "Create Account" : "Sign In to CyberQR"))}
+                    {loading ? "Procesando..." : (isForgotPassword ? "Enviar Enlace de Restablecimiento" : (isSignUp ? "Crear Cuenta" : "Iniciar Sesión en CyberQR"))}
                     <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
                   </button>
                 </div>
@@ -454,7 +454,7 @@ export default function Login() {
                     className="w-full flex items-center justify-center gap-2 text-sm font-semibold text-outline hover:text-on-surface transition-colors"
                   >
                     <ArrowLeft className="w-4 h-4" />
-                    Back to Sign In
+                    Volver al Inicio de Sesión
                   </button>
                 )}
               </form>
@@ -463,9 +463,9 @@ export default function Login() {
                 <footer className="mt-10 text-center">
                   <p className="font-body text-sm text-on-surface-variant">
                     {isSignUp ? (
-                      <>Already have an account? <button onClick={() => setIsSignUp(false)} className="text-[#006879] font-semibold hover:underline">Sign In</button></>
+                      <>¿Ya tienes una cuenta? <button onClick={() => setIsSignUp(false)} className="text-[#006879] font-semibold hover:underline">Iniciar Sesión</button></>
                     ) : (
-                      <>New to the enterprise? <button onClick={() => setIsSignUp(true)} className="text-[#006879] font-semibold hover:underline">Register Access</button></>
+                      <>¿Eres nuevo en la empresa? <button onClick={() => setIsSignUp(true)} className="text-[#006879] font-semibold hover:underline">Registrar Acceso</button></>
                     )}
                   </p>
                 </footer>
@@ -479,12 +479,12 @@ export default function Login() {
         <div className="flex flex-col md:flex-row justify-between items-center w-full px-8 py-12 max-w-7xl mx-auto">
           <div className="mb-6 md:mb-0">
             <span className="text-lg font-bold text-slate-900 dark:text-white font-headline">CyberQR</span>
-            <p className="text-slate-600 dark:text-slate-400 font-body text-sm mt-1">© 2024 CyberQR Enterprise. All rights reserved.</p>
+            <p className="text-slate-600 dark:text-slate-400 font-body text-sm mt-1">© 2026 Proyecto de Ingeniería de Software II. Todos los derechos reservados.</p>
           </div>
           <div className="flex flex-wrap justify-center gap-8">
-            <a className="text-slate-600 dark:text-slate-400 font-body text-sm hover:text-[#00B8D4] transition-all" href="#">Privacy Policy</a>
-            <a className="text-slate-600 dark:text-slate-400 font-body text-sm hover:text-[#00B8D4] transition-all" href="#">Documentation</a>
-            <a className="text-slate-600 dark:text-slate-400 font-body text-sm hover:text-[#00B8D4] transition-all" href="#">Support Center</a>
+            <a className="text-slate-600 dark:text-slate-400 font-body text-sm hover:text-[#00B8D4] transition-all" href="#">Política de Privacidad</a>
+            <a className="text-slate-600 dark:text-slate-400 font-body text-sm hover:text-[#00B8D4] transition-all" href="#">Documentación</a>
+            <a className="text-slate-600 dark:text-slate-400 font-body text-sm hover:text-[#00B8D4] transition-all" href="#">Centro de Soporte</a>
           </div>
         </div>
       </footer>

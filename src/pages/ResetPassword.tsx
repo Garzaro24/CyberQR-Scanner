@@ -29,7 +29,7 @@ export default function ResetPassword() {
   useEffect(() => {
     const verifyCode = async () => {
       if (!oobCode) {
-        setError("Invalid or missing reset code.");
+        setError("Código de restablecimiento inválido o faltante.");
         setVerifying(false);
         return;
       }
@@ -39,7 +39,7 @@ export default function ResetPassword() {
         setEmail(userEmail);
       } catch (err: any) {
         console.error("Verification error:", err);
-        setError("The reset link is invalid or has expired.");
+        setError("El enlace de restablecimiento es inválido o ha expirado.");
       } finally {
         setVerifying(false);
       }
@@ -53,12 +53,12 @@ export default function ResetPassword() {
     if (!oobCode) return;
 
     if (!isPasswordSecure) {
-      setError("Please meet all password security requirements.");
+      setError("Por favor, cumpla con todos los requisitos de seguridad de la contraseña.");
       return;
     }
 
     if (newPassword !== confirmPassword) {
-      setError("Passwords do not match.");
+      setError("Las contraseñas no coinciden.");
       return;
     }
 
@@ -67,11 +67,11 @@ export default function ResetPassword() {
 
     try {
       await confirmPasswordReset(auth, oobCode, newPassword);
-      setSuccess("Password has been reset successfully! You can now sign in with your new password.");
+      setSuccess("¡La contraseña ha sido restablecida con éxito! Ahora puede iniciar sesión con su nueva contraseña.");
       setTimeout(() => navigate("/login"), 3000);
     } catch (err: any) {
       console.error("Reset error:", err);
-      setError(err.message || "Failed to reset password. Please try again.");
+      setError(err.message || "Error al restablecer la contraseña. Por favor, inténtelo de nuevo.");
     } finally {
       setLoading(false);
     }
@@ -82,7 +82,7 @@ export default function ResetPassword() {
       <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4">
         <div className="flex flex-col items-center gap-4">
           <Loader2 className="w-8 h-8 animate-spin text-primary" />
-          <p className="text-on-surface-variant font-medium">Verifying reset code...</p>
+          <p className="text-on-surface-variant font-medium">Verificando código de restablecimiento...</p>
         </div>
       </div>
     );
@@ -96,9 +96,9 @@ export default function ResetPassword() {
             <div className="inline-flex items-center justify-center w-16 h-16 bg-primary/10 rounded-full mb-4">
               <ShieldCheck className="w-8 h-8 text-primary" />
             </div>
-            <h1 className="font-headline text-2xl font-bold text-on-surface tracking-tight">Set New Password</h1>
+            <h1 className="font-headline text-2xl font-bold text-on-surface tracking-tight">Establecer Nueva Contraseña</h1>
             <p className="text-on-surface-variant text-sm mt-2">
-              {email ? `Resetting password for ${email}` : "Enter your new secure password below."}
+              {email ? `Restableciendo contraseña para ${email}` : "Ingrese su nueva contraseña segura a continuación."}
             </p>
           </header>
 
@@ -120,14 +120,14 @@ export default function ResetPassword() {
             <form onSubmit={handleReset} className="space-y-6">
               <div className="space-y-4">
                 <div className="space-y-2">
-                  <label className="block text-xs font-bold text-on-surface-variant uppercase tracking-wider">New Password</label>
+                  <label className="block text-xs font-bold text-on-surface-variant uppercase tracking-wider">Nueva Contraseña</label>
                   <div className="relative">
                     <input 
                       type={showPassword ? "text" : "password"} 
                       value={newPassword}
                       onChange={(e) => setNewPassword(e.target.value)}
                       className="w-full px-4 py-3 bg-slate-50 border border-outline-variant/20 rounded-xl text-sm font-medium text-on-surface focus:ring-2 focus:ring-primary/20 outline-none pr-12"
-                      placeholder="Enter new password"
+                      placeholder="Ingrese nueva contraseña"
                       required
                       maxLength={10}
                     />
@@ -142,19 +142,19 @@ export default function ResetPassword() {
 
                   {newPassword && (
                     <div className="mt-3 space-y-2 p-3 bg-slate-50 rounded-xl border border-outline-variant/10">
-                      <p className="text-[10px] font-bold uppercase tracking-widest text-outline mb-2">Security Requirements</p>
+                      <p className="text-[10px] font-bold uppercase tracking-widest text-outline mb-2">Requisitos de Seguridad</p>
                       <div className="grid grid-cols-1 gap-1.5">
                         <div className={`flex items-center gap-2 text-xs ${passwordRequirements.length ? 'text-emerald-600' : 'text-outline'}`}>
                           {passwordRequirements.length ? <Check className="w-3 h-3" /> : <X className="w-3 h-3" />}
-                          <span>Between 6 and 10 characters</span>
+                          <span>Entre 6 y 10 caracteres</span>
                         </div>
                         <div className={`flex items-center gap-2 text-xs ${passwordRequirements.number ? 'text-emerald-600' : 'text-outline'}`}>
                           {passwordRequirements.number ? <Check className="w-3 h-3" /> : <X className="w-3 h-3" />}
-                          <span>At least 1 number</span>
+                          <span>Al menos 1 número</span>
                         </div>
                         <div className={`flex items-center gap-2 text-xs ${passwordRequirements.special ? 'text-emerald-600' : 'text-outline'}`}>
                           {passwordRequirements.special ? <Check className="w-3 h-3" /> : <X className="w-3 h-3" />}
-                          <span>At least 1 special character</span>
+                          <span>Al menos 1 carácter especial</span>
                         </div>
                       </div>
                       
@@ -172,13 +172,13 @@ export default function ResetPassword() {
                 </div>
 
                 <div className="space-y-2">
-                  <label className="block text-xs font-bold text-on-surface-variant uppercase tracking-wider">Confirm Password</label>
+                  <label className="block text-xs font-bold text-on-surface-variant uppercase tracking-wider">Confirmar Contraseña</label>
                   <input 
                     type="password" 
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
                     className="w-full px-4 py-3 bg-slate-50 border border-outline-variant/20 rounded-xl text-sm font-medium text-on-surface focus:ring-2 focus:ring-primary/20 outline-none"
-                    placeholder="Confirm new password"
+                    placeholder="Confirmar nueva contraseña"
                     required
                     maxLength={10}
                   />
@@ -190,7 +190,7 @@ export default function ResetPassword() {
                 disabled={loading || !isPasswordSecure}
                 className="w-full py-4 bg-primary text-white font-headline font-bold rounded-xl shadow-lg shadow-primary/20 hover:scale-[1.01] active:scale-[0.99] transition-all flex items-center justify-center gap-2 group disabled:opacity-50"
               >
-                {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : "Reset Password"}
+                {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : "Restablecer Contraseña"}
                 <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
               </button>
             </form>
@@ -202,7 +202,7 @@ export default function ResetPassword() {
               className="mt-6 w-full flex items-center justify-center gap-2 text-sm font-semibold text-outline hover:text-on-surface transition-colors"
             >
               <ArrowLeft className="w-4 h-4" />
-              Back to Sign In
+              Volver al Inicio de Sesión
             </button>
           )}
         </div>
