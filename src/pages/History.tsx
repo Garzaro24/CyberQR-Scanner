@@ -9,6 +9,7 @@ import { cn } from "../lib/utils";
 export default function History() {
   const [scans, setScans] = useState<ScanRecord[]>([]);
   const [loading, setLoading] = useState(true);
+  const [sortBy, setSortBy] = useState<"timestamp" | "status">("timestamp");
 
   useEffect(() => {
     if (!auth.currentUser) return;
@@ -31,9 +32,23 @@ export default function History() {
     return () => unsubscribe();
   }, []);
 
+  const sortedScans = [...scans].sort((a, b) => {
+    if (sortBy === "status") {
+      const statusOrder: Record<string, number> = { "MALICIOUS": 0, "SUSPICIOUS": 1, "SAFE": 2 };
+      const orderA = statusOrder[a.status] ?? 3;
+      const orderB = statusOrder[b.status] ?? 3;
+      return orderA - orderB;
+    }
+    // Default: timestamp desc
+    const timeA = a.timestamp?.toDate().getTime() || 0;
+    const timeB = b.timestamp?.toDate().getTime() || 0;
+    return timeB - timeA;
+  });
+
   const stats = {
     total: scans.length,
     blocked: scans.filter(s => s.status === "MALICIOUS").length,
+    suspicious: scans.filter(s => s.status === "SUSPICIOUS").length,
     safe: scans.filter(s => s.status === "SAFE").length
   };
 
@@ -44,7 +59,7 @@ export default function History() {
         <p className="text-on-surface-variant text-sm md:text-base max-w-2xl">Real-time surveillance logs of every QR interaction. Data is cryptographically verified to ensure environmental security.</p>
       </header>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 mb-8 md:mb-12">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-8 md:mb-12">
         <div className="bg-white p-6 md:p-8 rounded-xl flex flex-col justify-between border-l-4 border-[#006879] shadow-sm">
           <div>
             <span className="text-[10px] md:text-xs font-medium text-[#006879] uppercase tracking-widest mb-2 md:mb-4 block">Total Scans</span>
@@ -63,7 +78,16 @@ export default function History() {
             <span className="text-[10px] md:text-xs font-bold font-headline">Active Perimeter Shield</span>
           </div>
         </div>
-        <div className="bg-white p-6 md:p-8 rounded-xl flex flex-col justify-between border-l-4 border-[#10B981] shadow-sm sm:col-span-2 lg:col-span-1">
+        <div className="bg-white p-6 md:p-8 rounded-xl flex flex-col justify-between border-l-4 border-warning shadow-sm">
+          <div>
+            <span className="text-[10px] md:text-xs font-medium text-warning uppercase tracking-widest mb-2 md:mb-4 block">Suspicious Scans</span>
+            <h2 className="font-headline text-3xl md:text-4xl font-bold text-on-surface">{stats.suspicious.toLocaleString()}</h2>
+          </div>
+          <div className="flex items-center gap-2 mt-4 text-warning">
+            <span className="text-[10px] md:text-xs font-bold font-headline">Heuristic Anomaly Detection</span>
+          </div>
+        </div>
+        <div className="bg-white p-6 md:p-8 rounded-xl flex flex-col justify-between border-l-4 border-[#10B981] shadow-sm">
           <div>
             <span className="text-[10px] md:text-xs font-medium text-[#10B981] uppercase tracking-widest mb-2 md:mb-4 block">Verified Safe</span>
             <h2 className="font-headline text-3xl md:text-4xl font-bold text-on-surface">{stats.safe.toLocaleString()}</h2>
@@ -76,11 +100,27 @@ export default function History() {
 
       <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 mb-8">
         <div className="flex flex-wrap items-center gap-2 md:gap-4 w-full lg:w-auto">
-          <button className="bg-white px-4 md:px-6 py-2 rounded-lg border border-outline-variant/20 flex items-center gap-2 text-[10px] md:text-sm font-semibold hover:bg-slate-50 transition-all">
+          <button 
+            onClick={() => setSortBy("timestamp")}
+            className={cn(
+              "px-4 md:px-6 py-2 rounded-lg border flex items-center gap-2 text-[10px] md:text-sm font-semibold transition-all",
+              sortBy === "timestamp" 
+                ? "bg-[#006879] text-white border-[#006879]" 
+                : "bg-white border-outline-variant/20 text-on-surface hover:bg-slate-50"
+            )}
+          >
             <Filter className="w-3 h-3 md:w-4 md:h-4" />
             All Status
           </button>
-          <button className="bg-white px-4 md:px-6 py-2 rounded-lg border border-outline-variant/20 flex items-center gap-2 text-[10px] md:text-sm font-semibold hover:bg-slate-50 transition-all">
+          <button 
+            onClick={() => setSortBy("status")}
+            className={cn(
+              "px-4 md:px-6 py-2 rounded-lg border flex items-center gap-2 text-[10px] md:text-sm font-semibold transition-all",
+              sortBy === "status" 
+                ? "bg-[#006879] text-white border-[#006879]" 
+                : "bg-white border-outline-variant/20 text-on-surface hover:bg-slate-50"
+            )}
+          >
             <ShieldCheck className="w-3 h-3 md:w-4 md:h-4" />
             Threat Level
           </button>
@@ -108,8 +148,8 @@ export default function History() {
                 <tr>
                   <td colSpan={4} className="px-8 py-12 text-center text-on-surface-variant">Loading records...</td>
                 </tr>
-              ) : scans.length > 0 ? (
-                scans.map((scan) => (
+              ) : sortedScans.length > 0 ? (
+                sortedScans.map((scan) => (
                   <tr key={scan.id} className="hover:bg-surface-container-low/50 transition-colors group">
                     <td className="px-6 md:px-8 py-4 md:py-6">
                       <div className="flex flex-col">
@@ -121,7 +161,7 @@ export default function History() {
                       <div className="flex items-center gap-3">
                         <div className={cn(
                           "flex items-center gap-2",
-                          scan.status === "SAFE" ? "text-[#10B981]" : scan.status === "MALICIOUS" ? "text-error" : "text-warning"
+                          scan.status === "SAFE" ? "text-[#10B981]" : scan.status === "MALICIOUS" ? "text-error" : scan.status === "SUSPICIOUS" ? "text-warning" : "text-on-surface-variant"
                         )}>
                           <div className="relative flex items-center justify-center w-4 h-4 md:w-5 md:h-5 border-2 border-current rounded-full">
                             <div className="w-1 md:w-1.5 h-1 md:h-1.5 bg-current rounded-full"></div>
@@ -153,7 +193,7 @@ export default function History() {
         </div>
         
         <div className="px-6 md:px-8 py-4 md:py-6 bg-surface-container-low/30 border-t border-surface-container-low flex justify-between items-center">
-          <span className="text-xs md:text-sm text-on-surface-variant">Showing {scans.length} results</span>
+          <span className="text-xs md:text-sm text-on-surface-variant">Showing {sortedScans.length} results</span>
           <div className="flex gap-2">
             <button className="p-1.5 md:p-2 border border-outline-variant/20 rounded-lg hover:bg-white disabled:opacity-30" disabled>
               <ChevronLeft className="w-4 h-4" />
