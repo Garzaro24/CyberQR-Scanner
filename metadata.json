@@ -1,5 +1,5 @@
 {
-  "name": "CyberQR Enterprise",
+  "name": "CyberQR: Scanner",
   "description": "Autenticación QR de grado empresarial y monitoreo de detección de amenazas para protocolos de seguridad modernos.",
   "requestFramePermissions": ["camera"]
 }
