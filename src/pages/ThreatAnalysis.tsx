@@ -215,7 +215,9 @@ export default function ThreatAnalysis() {
                     <span className={cn(
                       "text-[10px] font-bold font-label px-2 py-0.5 rounded",
                       vector.status === "MALICIOUS" ? "bg-error/10 text-error" : vector.status === "SUSPICIOUS" ? "bg-warning/10 text-warning" : "bg-emerald-500/10 text-emerald-500"
-                    )}>{vector.status}</span>
+                    )}>
+                      {vector.status === "MALICIOUS" ? "MALICIOSO" : vector.status === "SUSPICIOUS" ? "SOSPECHOSO" : "SEGURO"}
+                    </span>
                   </div>
                   <p className="text-xs md:text-sm text-on-surface-variant leading-relaxed">{vector.description}</p>
                 </div>
@@ -226,28 +228,47 @@ export default function ThreatAnalysis() {
 
         {/* Risk Factors Sidebar */}
         <div className="col-span-12 lg:col-span-5 flex flex-col gap-6">
-          <div className="bg-surface-container-low rounded-xl p-6 md:p-8 h-full">
-            <h3 className="font-headline text-lg md:text-xl font-bold mb-6">Pesos de los Factores de Riesgo</h3>
+          <div className="bg-surface-container-low rounded-xl p-6 md:p-8 h-full border border-outline-variant/5">
+            <div className="flex justify-between items-center mb-6">
+              <h3 className="font-headline text-lg md:text-xl font-bold">Pesos de los Factores de Riesgo</h3>
+              <div className="flex items-center gap-2 px-2 py-1 bg-primary/10 rounded-md border border-primary/20">
+                <div className="w-1.5 h-1.5 bg-primary rounded-full animate-pulse"></div>
+                <span className="text-[9px] font-bold font-label text-primary uppercase tracking-widest">Análisis en Vivo</span>
+              </div>
+            </div>
             <div className="space-y-5 md:space-y-6">
-              {Object.entries(scan.threatDetails?.riskFactors || {}).map(([key, value]) => (
-                <div key={key} className="space-y-2">
-                  <div className="flex justify-between text-xs md:text-sm capitalize">
-                    <span className="font-medium">{key.replace(/([A-Z])/g, ' $1').trim()}</span>
-                    <span className={cn("font-bold", value > 70 ? "text-error" : value > 40 ? "text-warning" : "text-emerald-500")}>
-                      {value}%
-                    </span>
+              {Object.entries(scan.threatDetails?.riskFactors || {}).map(([key, value]) => {
+                const translatedKeys: Record<string, string> = {
+                  urlReputation: "Reputación de URL",
+                  payloadComplexity: "Complejidad de Carga Útil",
+                  domainHealth: "Salud del Dominio",
+                  latencyAnomaly: "Anomalía de Latencia"
+                };
+                return (
+                  <div key={key} className="space-y-2">
+                    <div className="flex justify-between text-xs md:text-sm">
+                      <span className="font-medium">{translatedKeys[key] || key}</span>
+                      <span className={cn("font-bold", value > 70 ? "text-error" : value > 40 ? "text-warning" : "text-emerald-500")}>
+                        {value}%
+                      </span>
+                    </div>
+                    <div className="h-1.5 w-full bg-surface-container-highest rounded-full">
+                      <div 
+                        className={cn(
+                          "h-full rounded-full transition-all duration-1000",
+                          value > 70 ? "bg-error" : value > 40 ? "bg-warning" : "bg-emerald-500"
+                        )} 
+                        style={{ width: `${value}%` }}
+                      ></div>
+                    </div>
                   </div>
-                  <div className="h-1.5 w-full bg-surface-container-highest rounded-full">
-                    <div 
-                      className={cn(
-                        "h-full rounded-full transition-all duration-1000",
-                        value > 70 ? "bg-error" : value > 40 ? "bg-warning" : "bg-emerald-500"
-                      )} 
-                      style={{ width: `${value}%` }}
-                    ></div>
-                  </div>
-                </div>
-              ))}
+                );
+              })}
+            </div>
+            <div className="mt-6 pt-4 border-t border-outline-variant/10">
+              <p className="text-[10px] text-on-surface-variant italic leading-relaxed">
+                * Los valores de los factores pueden variar ligeramente entre escaneos debido a la medición de latencia de red en tiempo real y actualizaciones dinámicas de los motores de seguridad globales.
+              </p>
             </div>
             <div className="mt-8 md:mt-10 p-4 md:p-6 bg-white rounded-xl shadow-sm space-y-4">
               <h4 className="font-bold text-xs md:text-sm">Mapa de Origen</h4>

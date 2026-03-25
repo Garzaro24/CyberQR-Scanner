@@ -72,6 +72,7 @@ export default function Scanner() {
     setScanning(true);
     
     try {
+      const startTime = Date.now();
       // Call our server-side VirusTotal proxy
       const response = await fetch("/api/scan-url", {
         method: "POST",
@@ -79,12 +80,29 @@ export default function Scanner() {
         body: JSON.stringify({ url: decodedText })
       });
 
+      const endTime = Date.now();
+      const latency = endTime - startTime;
+
       if (!response.ok) throw new Error("Error al escanear la URL a través de VirusTotal");
 
       const vtData = await response.json();
       const status = vtData.status;
       const riskScore = vtData.riskScore;
       
+      // Calculate more realistic risk factors
+      const urlReputation = riskScore; // High risk score = high reputation risk
+      const payloadComplexity = status === "MALICIOUS" ? 85 : (status === "SUSPICIOUS" ? 45 : 12);
+      
+      // Domain health based on GSB and Urlscan
+      let domainHealthRisk = 0;
+      if (vtData.engines?.googleSafeBrowsing?.status === "MALICIOUS") domainHealthRisk += 60;
+      if (vtData.engines?.urlScan?.status === "SUSPICIOUS") domainHealthRisk += 30;
+      if (status === "SAFE") domainHealthRisk = Math.max(5, domainHealthRisk);
+      else domainHealthRisk = Math.min(95, domainHealthRisk + 10);
+
+      // Latency anomaly: baseline is ~1500ms for 3 API calls
+      const latencyAnomaly = Math.min(100, Math.max(5, Math.round((latency / 3000) * 100)));
+
       const scanData = {
         userId: auth.currentUser.uid,
         url: decodedText,
@@ -111,10 +129,10 @@ export default function Scanner() {
             }
           ],
           riskFactors: {
-            urlReputation: riskScore > 50 ? 90 : 10,
-            payloadComplexity: status === "SAFE" ? 5 : 88,
-            domainHealth: status === "SAFE" ? 90 : 42,
-            latencyAnomaly: 12
+            urlReputation: urlReputation,
+            payloadComplexity: payloadComplexity,
+            domainHealth: domainHealthRisk,
+            latencyAnomaly: latencyAnomaly
           }
         }
       };
