@@ -110,11 +110,29 @@ export default function Login() {
     }
   };
 
+  const [canResend, setCanResend] = useState(false);
+  const [resendLoading, setResendLoading] = useState(false);
+
+  const handleResendVerification = async () => {
+    if (!auth.currentUser) return;
+    setResendLoading(true);
+    try {
+      await sendEmailVerification(auth.currentUser);
+      setSuccess("¡Correo de verificación reenviado! Por favor, revisa tu bandeja de entrada.");
+      setCanResend(false);
+    } catch (err: any) {
+      setError(err.message || "Error al reenviar el correo de verificación.");
+    } finally {
+      setResendLoading(false);
+    }
+  };
+
   const handleEmailAuth = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError(null);
     setSuccess(null);
+    setCanResend(false);
 
     const cleanEmail = sanitizeInput(email);
     const cleanPassword = password; // Don't sanitize password as it might contain special chars, but it's handled by Firebase
@@ -185,9 +203,15 @@ export default function Login() {
         const result = await signInWithEmailAndPassword(auth, cleanEmail, cleanPassword);
         const user = result.user;
 
-        if (!user.emailVerified) {
-          setError("Por favor, verifica tu dirección de correo electrónico antes de iniciar sesión. Revisa tu bandeja de entrada para ver el enlace.");
-          // Optionally resend verification: await sendEmailVerification(user);
+        // Reload user to get latest emailVerified status
+        await user.reload();
+        const updatedUser = auth.currentUser;
+
+        if (updatedUser && !updatedUser.emailVerified) {
+          setError("Por favor, verifica tu dirección de correo electrónico antes de iniciar sesión.");
+          setCanResend(true);
+          // We don't sign out immediately here so they can click "Resend"
+          // But we will sign them out if they refresh or navigate away
           return;
         }
 
@@ -419,9 +443,21 @@ export default function Login() {
                 )}
                 
                 {error && (
-                  <div className="p-3 bg-error/10 border border-error/20 rounded-md flex items-center gap-2 text-error text-sm">
-                    <ShieldAlert className="w-4 h-4 flex-shrink-0" />
-                    <span>{error}</span>
+                  <div className="p-3 bg-error/10 border border-error/20 rounded-md flex flex-col gap-2 text-error text-sm">
+                    <div className="flex items-center gap-2">
+                      <ShieldAlert className="w-4 h-4 flex-shrink-0" />
+                      <span>{error}</span>
+                    </div>
+                    {canResend && (
+                      <button
+                        type="button"
+                        onClick={handleResendVerification}
+                        disabled={resendLoading}
+                        className="text-xs font-bold uppercase tracking-widest text-[#006879] hover:underline self-start mt-1 disabled:opacity-50"
+                      >
+                        {resendLoading ? "Enviando..." : "Reenviar correo de verificación"}
+                      </button>
+                    )}
                   </div>
                 )}
 

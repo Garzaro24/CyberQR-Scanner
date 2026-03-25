@@ -14,7 +14,12 @@ export default function ProtectedRoute({ children }: Props) {
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
-      setUser(user);
+      // If user is logged in but not verified, we treat them as not logged in for protected routes
+      if (user && !user.emailVerified) {
+        setUser(null);
+      } else {
+        setUser(user);
+      }
       setLoading(false);
     });
     return () => unsubscribe();
