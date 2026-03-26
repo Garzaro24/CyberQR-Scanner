@@ -144,6 +144,24 @@ export default function Login() {
       return;
     }
 
+    if (isSignUp && (!cleanName || cleanName.length < 3)) {
+      setError("Por favor, introduce tu nombre completo (mínimo 3 caracteres).");
+      setLoading(false);
+      return;
+    }
+
+    if (isSignUp && /[^a-zA-ZáéíóúÁÉÍÓÚñÑ\s]/.test(cleanName)) {
+      setError("El nombre no puede contener números ni caracteres especiales.");
+      setLoading(false);
+      return;
+    }
+
+    if (isSignUp && cleanName.length > 20) {
+      setError("El nombre no puede exceder los 20 caracteres.");
+      setLoading(false);
+      return;
+    }
+
     if (isSignUp && !isPasswordSecure) {
       setError("Por favor, cumple con todos los requisitos de seguridad de la contraseña.");
       setLoading(false);
@@ -328,8 +346,14 @@ export default function Login() {
                         placeholder="John Doe" 
                         type="text"
                         value={displayName}
-                        onChange={(e) => setDisplayName(e.target.value)}
+                        onChange={(e) => {
+                          const value = e.target.value;
+                          // Remove numbers and special characters, allowing only letters and spaces (including Spanish accents)
+                          const filteredValue = value.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑ\s]/g, '');
+                          setDisplayName(filteredValue);
+                        }}
                         required={isSignUp}
+                        maxLength={20}
                       />
                       <div className="absolute bottom-0 left-0 w-0 h-0.5 bg-primary transition-all duration-300 peer-focus:w-full"></div>
                     </div>
